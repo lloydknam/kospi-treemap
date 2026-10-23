@@ -18,18 +18,13 @@ jobs:
       - name: Collect
         run: python -u collect.py 2>&1 | tee collect.log; exit ${PIPESTATUS[0]}
         shell: bash
-      - name: Save log
-        if: always()
-        run: |
-          git config user.name "github-actions"; git config user.email "actions@github.com"
-          mkdir -p logs; tail -c 6000 collect.log > logs/collect.log || true
-          git add logs; git diff --cached --quiet || git commit -m "log"; git pull --rebase -q; git push || true
       - name: Render
         run: python render.py data/kospi_mcap.csv kospi.mp4 --top 60
       - name: Commit data
         run: |
           git config user.name "github-actions"; git config user.email "actions@github.com"
-          git add data; git diff --cached --quiet || git commit -m "data: update $(date +%F)"; git push
+          mkdir -p logs; tail -c 6000 collect.log > logs/collect.log
+          git add data logs; git diff --cached --quiet || git commit -m "data: update $(date +%F)"; git pull --rebase -q || true; git push || true
       - name: Release
         env: { GH_TOKEN: "${{ github.token }}" }
         run: |
