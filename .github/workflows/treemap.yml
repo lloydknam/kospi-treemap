@@ -13,7 +13,7 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
       - run: |
-          sudo apt-get update -y && sudo apt-get install -y ffmpeg fonts-noto-cjk
+          sudo apt-get install -y --no-install-recommends fonts-noto-cjk
           pip install yfinance requests squarify matplotlib pandas
       - name: Collect
         run: python -u collect.py 2>&1 | tee collect.log; exit ${PIPESTATUS[0]}

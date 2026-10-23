@@ -20,9 +20,14 @@ for i, c in enumerate(codes):
         t = yf.Ticker(c + ".KS")
         h = t.history(start=START, auto_adjust=False)
         sh = t.get_shares_full(start=START)
-        if h.empty or sh is None or len(sh) == 0: print(c, names[c], "no data"); continue
+        if h.empty: print(c, names[c], "no price"); continue
+        if sh is None or len(sh) == 0:
+            n = t.info.get("sharesOutstanding") or getattr(t.fast_info, "shares", None)
+            if not n: print(c, names[c], "no shares"); continue
+            sh = pd.Series([n], index=[h.index[0]])
+            print(c, names[c], "const shares", n)
         h.index = h.index.tz_localize(None).normalize()
-        sh.index = sh.index.tz_localize(None).normalize()
+        sh.index = pd.DatetimeIndex(sh.index).tz_localize(None).normalize()
         sh = sh[~sh.index.duplicated(keep="last")].sort_index()
         s = sh.reindex(h.index.union(sh.index)).ffill().reindex(h.index)
         s = s.bfill()
