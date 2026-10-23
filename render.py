@@ -16,8 +16,9 @@ ap = argparse.ArgumentParser()
 ap.add_argument("csv"); ap.add_argument("out")
 ap.add_argument("--index", default="data/kospi_index.csv")
 ap.add_argument("--top", type=int, default=60)
-ap.add_argument("--freq", default="weekly", choices=["weekly", "daily"])
-ap.add_argument("--sub", type=int, default=7, help="구간당 보간 프레임 (작을수록 빠름)")
+ap.add_argument("--freq", default="daily", choices=["weekly", "daily"])
+ap.add_argument("--start", default="2025-01-01")
+ap.add_argument("--sub", type=int, default=2, help="구간당 보간 프레임 (작을수록 빠름)")
 ap.add_argument("--fps", type=int, default=24)
 ap.add_argument("--abs", action="store_true")
 ap.add_argument("--note", default="")
@@ -29,6 +30,7 @@ for f in ["Noto Sans CJK KR", "NanumGothic", "Malgun Gothic", "AppleGothic", "No
 plt.rcParams["axes.unicode_minus"] = False
 
 df = pd.read_csv(a.csv, parse_dates=["date"], dtype={"ticker": str}).sort_values(["ticker", "date"])
+df = df[df["date"] >= a.start]
 if a.freq == "weekly":
     keep = df.groupby(df["date"].dt.to_period("W"))["date"].max().values
     df = df[df["date"].isin(keep)].copy()

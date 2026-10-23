@@ -20,10 +20,10 @@ jobs:
         run: python -u collect.py 2>&1 | tee collect.log; exit ${PIPESTATUS[0]}
         shell: bash
       - name: Render
-        run: python -u render.py data/kospi_mcap.csv kospi.mp4 --top 60 --sub 7 2>&1 | tee render.log; exit ${PIPESTATUS[0]}
+        run: python -u render.py data/kospi_mcap.csv kospi.mp4 --top 60 2>&1 | tee render.log; exit ${PIPESTATUS[0]}
         shell: bash
       - name: Render absolute
-        run: python -u render.py data/kospi_mcap.csv kospi_abs.mp4 --top 60 --abs --sub 7
+        run: python -u render.py data/kospi_mcap.csv kospi_abs.mp4 --top 60 --abs
       - name: Save render log
         if: always()
         run: |
