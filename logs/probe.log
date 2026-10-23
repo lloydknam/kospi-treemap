@@ -1,0 +1,29 @@
+https://data.krx.co.kr/ -> 200
+https://finance.naver.com/sise/sise_market_sum.naver?sosok=0&page=1 -> 302
+https://fchart.stock.naver.com/sise.nhn?symbol=005930&timeframe=day&count=5&requestType=0 -> 200
+https://query1.finance.yahoo.com/v8/finance/chart/005930.KS -> 200
+/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/yfinance/utils.py:568: Pandas4Warning: The inplace keyword in DataFrame.sort_index is deprecated and will be removed in a future version (PDEP-8).
+See https://pandas.pydata.org/docs/dev/whatsnew/v3.1.0.html#deprecation-inplace for more details.
+  quotes.sort_index(inplace=True)
+/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/yfinance/utils.py:585: Pandas4Warning: The inplace keyword in DataFrame.set_index is deprecated and will be removed in a future version (PDEP-8).
+See https://pandas.pydata.org/docs/dev/whatsnew/v3.1.0.html#deprecation-inplace for more details.
+  dividends.set_index("date", inplace=True)
+/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/yfinance/utils.py:587: Pandas4Warning: The inplace keyword in DataFrame.sort_index is deprecated and will be removed in a future version (PDEP-8).
+See https://pandas.pydata.org/docs/dev/whatsnew/v3.1.0.html#deprecation-inplace for more details.
+  dividends.sort_index(inplace=True)
+/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/yfinance/utils.py:514: Pandas4Warning: The inplace keyword in DataFrame.drop is deprecated and will be removed in a future version (PDEP-8).
+See https://pandas.pydata.org/docs/dev/whatsnew/v3.1.0.html#deprecation-inplace for more details.
+  df.drop(
+/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/site-packages/yfinance/utils.py:518: Pandas4Warning: The inplace keyword in DataFrame.rename is deprecated and will be removed in a future version (PDEP-8).
+See https://pandas.pydata.org/docs/dev/whatsnew/v3.1.0.html#deprecation-inplace for more details.
+  df.rename(columns={
+                               Open      High  ...  Dividends  Stock Splits
+Date                                           ...                         
+2026-10-21 00:00:00+09:00  217000.0  228000.0  ...        0.0           0.0
+2026-10-22 00:00:00+09:00  221500.0  226000.0  ...        0.0           0.0
+2026-10-23 00:00:00+09:00  206000.0  215500.0  ...        0.0           0.0
+
+[3 rows x 7 columns]
+2026-10-22 00:00:00+09:00    6511922712
+2026-10-23 00:00:00+09:00    6511922712
+dtype: int64
