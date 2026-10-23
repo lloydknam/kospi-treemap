@@ -1,4 +1,2 @@
-Traceback (most recent call last):
-  File "/home/runner/work/kospi-treemap/kospi-treemap/collect.py", line 6, in <module>
-    import pandas as pd, requests, yfinance as yf
-ModuleNotFoundError: No module named 'yfinance'
+tickers 0 [] []
+ticker list failed
