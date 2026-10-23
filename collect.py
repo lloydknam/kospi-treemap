@@ -42,6 +42,11 @@ for i, c in enumerate(codes):
 
 if not rows: sys.exit("no data")
 import os; os.makedirs("data", exist_ok=True)
+ixh = yf.Ticker("^KS11").history(start=START)
+ixh.index = ixh.index.tz_localize(None).normalize(); ixh.index.name = "date"
+import os; os.makedirs("data", exist_ok=True)
+ixh[["Close"]].rename(columns={"Close": "close"}).reset_index().to_csv("data/kospi_index.csv", index=False)
+print("index rows", len(ixh))
 out = pd.concat(rows, ignore_index=True).dropna(subset=["mcap"])
 out = out[out["date"] >= "2024-01-02"]
 out.to_csv("data/kospi_mcap.csv", index=False, encoding="utf-8-sig")
