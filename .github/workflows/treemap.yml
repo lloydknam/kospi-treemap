@@ -8,12 +8,13 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
       - run: |
-          sudo apt-get install -y --no-install-recommends ffmpeg fonts-noto-cjk
+          (which ffmpeg && fc-list | grep -qi 'noto.*cjk') || timeout 180 sudo apt-get install -y --no-install-recommends ffmpeg fonts-noto-cjk || true
           pip install yfinance requests squarify matplotlib pandas
       - name: Collect
         run: python -u collect.py 2>&1 | tee collect.log; exit ${PIPESTATUS[0]}
