@@ -1,43 +1,48 @@
-"""KOSPI 일별 시총/등락률 증분 수집 -> data/kospi_mcap.csv
-사용: python collect.py [--start 20260102]
+"""KOSPI 상위 종목 일별 시총 -> data/kospi_mcap.csv
+종목/이름: 네이버 금융 시총순위, 종가: Yahoo, 시총 = 종가 x (일별 발행주식수, Yahoo)
+(KRX 직접 수집은 해외 IP에서 막혀 우회. 시총은 보통주 기준 근사치)
 """
-import argparse, os, sys, time
-from datetime import datetime
-import pandas as pd
-from pykrx import stock
+import re, sys, time, warnings
+import pandas as pd, requests, yfinance as yf
+warnings.filterwarnings("ignore")
+START, TOPN = "2026-01-01", 120
+H = {"User-Agent": "Mozilla/5.0"}
 
-OUT = "data/kospi_mcap.csv"
-ap = argparse.ArgumentParser()
-ap.add_argument("--start", default="20260102")
-ap.add_argument("--end", default=datetime.now().strftime("%Y%m%d"))
-a = ap.parse_args()
+codes, names = [], {}
+for pg in range(1, 4):
+    r = requests.get("https://finance.naver.com/sise/sise_market_sum.naver",
+                     params={"sosok": 0, "page": pg}, headers=H, timeout=20)
+    r.encoding = "euc-kr"
+    for c, n in re.findall(r'href="/item/main\.naver\?code=(\d{6})"[^>]*>([^<]+)<', r.text):
+        if c not in names:
+            names[c] = n.strip(); codes.append(c)
+codes = codes[:TOPN]
+print("tickers", len(codes), codes[:5], [names[c] for c in codes[:5]])
+if len(codes) < 30: sys.exit("ticker list failed")
 
-old = None
-start = a.start
-if os.path.exists(OUT):
-    old = pd.read_csv(OUT, parse_dates=["date"], dtype={"ticker": str})
-    start = (old["date"].max() + pd.Timedelta(days=1)).strftime("%Y%m%d")
-if start > a.end:
-    print("up to date"); sys.exit(0)
-
-rows, errs = [], 0
-for d in pd.bdate_range(start, a.end).strftime("%Y%m%d"):
+rows = []
+for i, c in enumerate(codes):
     try:
-        cap = stock.get_market_cap(d, market="KOSPI")
-        ohl = stock.get_market_ohlcv(d, market="KOSPI")
+        t = yf.Ticker(c + ".KS")
+        h = t.history(start=START, auto_adjust=False)
+        sh = t.get_shares_full(start=START)
+        if h.empty or sh is None or len(sh) == 0: print(c, names[c], "no data"); continue
+        h.index = h.index.tz_localize(None).normalize()
+        sh.index = sh.index.tz_localize(None).normalize()
+        sh = sh[~sh.index.duplicated(keep="last")].sort_index()
+        s = sh.reindex(h.index.union(sh.index)).ffill().reindex(h.index)
+        s = s.bfill()
+        d = pd.DataFrame({"close": h["Close"], "mcap": h["Close"] * s})
+        d["chg"] = d["close"].pct_change() * 100
+        d["ticker"], d["name"] = c, names[c]
+        d.index.name = "date"
+        rows.append(d.reset_index()); print(i, c, names[c], len(d))
     except Exception as e:
-        errs += 1; print(d, "ERR", repr(e)[:200]); continue
-    if cap.empty or cap["시가총액"].sum() == 0:
-        print(d, "holiday"); continue
-    df = cap[["시가총액"]].join(ohl[["종가", "등락률"]])
-    df["date"] = pd.to_datetime(d); df["ticker"] = df.index
-    rows.append(df); print(d, len(df)); time.sleep(0.3)
+        print(c, names[c], "ERR", repr(e)[:120])
+    time.sleep(0.2)
 
-if not rows:
-    print("no data fetched, errors:", errs); sys.exit(1 if errs else 0)
-new = pd.concat(rows, ignore_index=True)
-new["name"] = new["ticker"].map({t: stock.get_market_ticker_name(t) for t in new["ticker"].unique()})
-new = new.rename(columns={"시가총액": "mcap", "종가": "close", "등락률": "chg"})
-out = pd.concat([old, new], ignore_index=True) if old is not None else new
-out.to_csv(OUT, index=False, encoding="utf-8-sig")
-print("saved", len(out), "rows")
+if not rows: sys.exit("no data")
+out = pd.concat(rows, ignore_index=True).dropna(subset=["mcap"])
+out = out[out["date"] >= "2026-01-02"]
+out.to_csv("data/kospi_mcap.csv", index=False, encoding="utf-8-sig")
+print("saved", len(out), "rows", out["date"].nunique(), "days")

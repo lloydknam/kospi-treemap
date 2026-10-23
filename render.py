@@ -33,7 +33,6 @@ def layout(day):
     d = df[df.date == day].set_index("ticker")
     sel = d.loc[d.index.intersection(topn)].copy()
     vals = sel["mcap"].astype(float)
-    vals.loc["_ETC"] = float(d["mcap"].sum() - vals.sum())
     vals = vals.sort_values(ascending=False)
     sizes = squarify.normalize_sizes(vals.values, W, H)
     rects = squarify.squarify(sizes, 0, 0, W, H)
@@ -42,11 +41,9 @@ def layout(day):
         chg = sel["chg"].to_dict()
     else:
         chg = ((sel["close"] / first.reindex(sel.index) - 1) * 100).to_dict()
-    chg["_ETC"] = 0.0
     return pos, chg, d["mcap"].sum()
 
 names = df.drop_duplicates("ticker").set_index("ticker")["name"].to_dict()
-names["_ETC"] = "기타"
 L = [layout(d) for d in dates]
 
 lim = 3.0 if a.color == "daily" else 30.0
@@ -85,7 +82,7 @@ for i in range(max(len(dates) - 1, 1)):
         d = pd.Timestamp(dates[i])
         title.set_text(f"KOSPI 시가총액 지도  {d:%Y-%m-%d}")
         tot = (L[i][2] * (1 - f) + L[j][2] * f) / 1e12
-        sub.set_text(f"면적=시총 · 색={'전일대비' if a.color=='daily' else '연초대비'} 등락률 · 전체 {tot:,.0f}조원")
+        sub.set_text(f"면적=시총 · 색={'전일대비' if a.color=='daily' else '연초대비'} 등락률 · 상위 {len(topn)}개 합계 {tot:,.0f}조원")
         fig.canvas.draw()
         ff.stdin.write(np.asarray(fig.canvas.buffer_rgba())[:, :, :3].tobytes())
 ff.stdin.close(); ff.wait()
