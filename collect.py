@@ -36,6 +36,7 @@ for i, c in enumerate(codes):
     time.sleep(0.2)
 
 if not rows: sys.exit("no data")
+import os; os.makedirs("data", exist_ok=True)
 out = pd.concat(rows, ignore_index=True).dropna(subset=["mcap"])
 out = out[out["date"] >= "2026-01-02"]
 out.to_csv("data/kospi_mcap.csv", index=False, encoding="utf-8-sig")
