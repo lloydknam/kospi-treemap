@@ -1,0 +1,26 @@
+name: probe
+on: workflow_dispatch
+permissions: { contents: write }
+jobs:
+  p:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: |
+          pip install yfinance pandas lxml requests >/dev/null 2>&1
+          {
+          for u in "https://data.krx.co.kr/" "https://finance.naver.com/sise/sise_market_sum.naver?sosok=0&page=1" "https://fchart.stock.naver.com/sise.nhn?symbol=005930&timeframe=day&count=5&requestType=0" "https://query1.finance.yahoo.com/v8/finance/chart/005930.KS"; do
+            echo "$u -> $(curl -s -o /dev/null -w '%{http_code}' -m 15 -A 'Mozilla/5.0' "$u")"
+          done
+          python - <<'P'
+          import yfinance as yf
+          d=yf.Ticker("005930.KS")
+          h=d.history(start="2026-01-01")
+          print(h.tail(3)); print(d.get_shares_full(start="2026-01-01").tail(2))
+          P
+          } > probe.log 2>&1 || true
+          mkdir -p logs && cp probe.log logs/probe.log
+          git config user.name gha; git config user.email a@b.c
+          git add logs; git commit -qm probe; git push
