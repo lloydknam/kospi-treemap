@@ -16,6 +16,7 @@ ap.add_argument("--top", type=int, default=60)
 ap.add_argument("--freq", default="weekly", choices=["weekly", "daily"])
 ap.add_argument("--sub", type=int, default=10, help="구간당 보간 프레임")
 ap.add_argument("--fps", type=int, default=24)
+ap.add_argument("--abs", action="store_true", help="면적=시총 절대값(전체 크기가 시총 따라 커짐)")
 ap.add_argument("--note", default="")
 a = ap.parse_args()
 
@@ -38,12 +39,17 @@ W, H = 100.0, 56.25
 unit = "주간" if a.freq == "weekly" else "전일대비"
 lim = 8.0 if a.freq == "weekly" else 3.0
 
+tot_by = df[df.ticker.isin(topn)].groupby("date")["mcap"].sum()
+REF = tot_by.max()                       # 기간 중 최대 시총 = 프레임 전체
+
 def layout(day):
     d = df[df.date == day].set_index("ticker")
     sel = d.loc[d.index.intersection(topn)]
     vals = sel["mcap"].astype(float).sort_values(ascending=False)
-    sizes = squarify.normalize_sizes(vals.values, W, H)
-    rects = squarify.squarify(sizes, 0, 0, W, H)
+    k = (vals.sum() / REF) ** 0.5 if a.abs else 1.0     # 길이 배율 (면적 ∝ 시총)
+    w_, h_ = W * k, H * k
+    sizes = squarify.normalize_sizes(vals.values, w_, h_)
+    rects = squarify.squarify(sizes, 0, H - h_, w_, h_)  # 좌하단 기준
     pos = {t: (r["x"], r["y"], r["dx"], r["dy"]) for t, r in zip(vals.index, rects)}
     return pos, sel["chg"].to_dict(), vals.sum()
 
@@ -88,6 +94,8 @@ for i in range(steps):
     for s in range(a.sub + (a.fps if last else 0)):      # 마지막엔 1초 정지
         f = min(s / a.sub, 1.0)
         ax.clear(); ax.axis("off"); ax.set_xlim(0, W); ax.set_ylim(H, 0)
+        if a.abs:
+            ax.add_patch(Rectangle((0, 0), W, H, fill=False, ec="#c9cde0", lw=1.5, ls="--"))
         for k in set(L[i][0]) | set(L[j][0]):
             p0 = L[i][0].get(k, L[j][0].get(k)); p1 = L[j][0].get(k, p0)
             x, y, w, h = [p0[n] * (1 - f) + p1[n] * f for n in range(4)]
@@ -100,7 +108,7 @@ for i in range(steps):
         dcur = pd.Timestamp(dates[j] if f >= 0.5 else dates[i])
         date_t.set_text(f"{dcur:%Y.%m.%d}")
         tot = (L[i][2] * (1 - f) + L[j][2] * f) / 1e12
-        sub_t.set_text(f"면적=시총 · 색={unit} 등락률 · 상위 {len(topn)}개 {tot:,.0f}조원"
+        sub_t.set_text((f"면적=시총 절대값(점선=최대 {REF/1e12:,.0f}조원) · " if a.abs else "면적=시총 비중 · ") + f"색={unit} 등락률 · 상위 {len(topn)}개 {tot:,.0f}조원"
                        + (" · 매주 금요일 종가" if a.freq == "weekly" else ""))
         ruler((i + f) / steps * 100)
         fig.canvas.draw()

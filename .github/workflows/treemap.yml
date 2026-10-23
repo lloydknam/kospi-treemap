@@ -21,6 +21,8 @@ jobs:
       - name: Render
         run: python -u render.py data/kospi_mcap.csv kospi.mp4 --top 60 2>&1 | tee render.log; exit ${PIPESTATUS[0]}
         shell: bash
+      - name: Render absolute
+        run: python -u render.py data/kospi_mcap.csv kospi_abs.mp4 --top 60 --abs
       - name: Save render log
         if: always()
         run: |
@@ -36,6 +38,10 @@ jobs:
         env: { GH_TOKEN: "${{ github.token }}" }
         run: |
           gh release view latest >/dev/null 2>&1 || gh release create latest -t "KOSPI treemap (latest)" -n "자동 갱신"
-          gh release upload latest kospi.mp4 --clobber
+          gh release upload latest kospi.mp4 kospi_abs.mp4 --clobber
       - uses: actions/upload-artifact@v4
-        with: { name: kospi-mp4, path: kospi.mp4 }
+        with:
+          name: kospi-mp4
+          path: |
+            kospi.mp4
+            kospi_abs.mp4
