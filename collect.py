@@ -28,7 +28,7 @@ for x in stocks:
     except Exception:
         continue
     if mv > 0 and px > 0:
-        meta[x["itemCode"]] = {"name": x["stockName"], "shares": mv / px, "mv": mv}
+        meta[x["itemCode"]] = {"name": x["stockName"], "shares": mv / px, "mv": mv, "px": px}
 print("naver stocks", len(meta))
 if len(meta) < 300: sys.exit("naver list failed")
 codes = sorted(meta, key=lambda c: -meta[c]["mv"])
@@ -70,11 +70,17 @@ for c in [c for c in codes if c.endswith("0")][:120]:
 print("share-ratio tickers", len(ratio))
 
 # ---- 4) 합치기
-rows = []
+rows, bad = [], []
 for c, cl in closes.items():
     cl.index = pd.DatetimeIndex(cl.index).tz_localize(None).normalize()
     cl = cl[~cl.index.duplicated(keep="last")]
     sh = meta[c]["shares"]
+    # 검증 1) 야후 최신 종가가 네이버 현재가와 크게 다르면(다른 종목/오류) 제외
+    if abs(cl.iloc[-1] / meta[c]["px"] - 1) > 0.05:
+        bad.append((c, meta[c]["name"], "px mismatch", round(cl.iloc[-1] / meta[c]["px"], 2))); continue
+    # 검증 2) 일일 변동 31% 초과(가격제한폭 초과)는 액면분할/감자 미조정 가능성 -> 제외
+    if (cl.pct_change().abs() > 0.315).any():
+        bad.append((c, meta[c]["name"], "jump", round(cl.pct_change().abs().max(), 2))); continue
     if c in ratio:
         rr = ratio[c].reindex(cl.index.union(ratio[c].index)).ffill().reindex(cl.index).bfill()
         shs = sh * rr
@@ -85,6 +91,7 @@ for c, cl in closes.items():
     d["ticker"], d["name"] = c, meta[c]["name"]
     d.index.name = "date"
     rows.append(d.reset_index())
+print("dropped", len(bad)); [print("  drop", b) for b in bad[:60]]
 out = pd.concat(rows, ignore_index=True).dropna(subset=["mcap"])
 out["mcap"] = out["mcap"].round(0).astype("int64"); out["close"] = out["close"].round(1); out["chg"] = out["chg"].round(3)
 out.to_csv("data/kospi_mcap.csv", index=False, encoding="utf-8-sig")

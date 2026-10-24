@@ -43,7 +43,7 @@ jobs:
         env: { GH_TOKEN: "${{ github.token }}" }
         run: |
           gh release view latest >/dev/null 2>&1 || gh release create latest -t "KOSPI treemap (latest)" -n "자동 갱신"
-          gh release upload latest kospi.mp4 kospi_abs.mp4 --clobber
+          gh release upload latest kospi.mp4 kospi_abs.mp4 data/kospi_mcap.csv --clobber
       - uses: actions/upload-artifact@v4
         with:
           name: kospi-mp4
