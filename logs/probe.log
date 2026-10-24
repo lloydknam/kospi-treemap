@@ -1,5 +1,10 @@
-screen ERR ValueError('Operand must be length longer than 1')
-sok=0&page=1 200 130809 0 <!DOCTYPE html><html lang="ko" class="" data-theme="light"><head><meta charSet="utf-8"/><meta name="viewport" content="width=1366, initial-scale=1.0, 
-[]
-ok=0&page=20 200 130809 0 <!DOCTYPE html><html lang="ko" class="" data-theme="light"><head><meta charSet="utf-8"/><meta name="viewport" content="width=1366, initial-scale=1.0, 
-[]
+total 931 keys ['language', 'region', 'quoteType', 'typeDisp', 'quoteSourceName', 'triggerable', 'customPriceAlertConfidence', 'currency', 'regularMarketChangePercent', 'exchange', 'fiftyTwoWeekHigh', 'fiftyTwoWeekLow', 'averageAnalystRating', 'dividendYield', 'financialCurrency', 'shortName', 'fulldayPrice', 'fulldayChange', 'fulldayChangePercent', 'ask', 'bid', 'marketCap', 'hasPrePostMarketData', 'firstTradeDateMilliseconds', 'priceHint', 'regularMarketChange', 'regularMarketTime', 'regularMarketPrice', 'regularMarketDayHigh', 'regularMarketDayRange', 'regularMarketDayLow', 'regularMarketVolume', 'regularMarketPreviousClose', 'bidSize', 'askSize', 'market', 'messageBoardId', 'fullExchangeName', 'longName', 'regularMarketOpen']
+rows 931
+005930.KS SamsungElec 1403319360684032 EQUITY 5709551509
+005935.KS SamsungElec(1P) 1107860373110784 EQUITY 802371203
+000660.KS SK hynix 930762698260480 EQUITY 728866596
+402340.KS SKSQUARE 102124927057920 EQUITY 131774099
+quoteTypes {'EQUITY': 931}
+code0 806
+alue/KOSPI?page=1&pageSize=100 200 191918 {"stockListSortType":"MARKET_VALUE","stockListCategoryType":"KOSPI","stocks":[{"stockType":"domestic","stockEndType":"stock","itemCode":"005930","reutersCode":"005930","stockName":"삼성전자","sosok":"0","closePrice":"213,500","compareToPreviousClosePrice":"-1,000","compareToPreviousPrice":{"code":"5","t
+alue/KOSPI?page=9&pageSize=100 200 159075 {"stockListSortType":"MARKET_VALUE","stockListCategoryType":"KOSPI","stocks":[{"stockType":"domestic","stockEndType":"etf","itemCode":"490090","reutersCode":"490090","stockName":"TIGER 미국AI빅테크10","sosok":"0","closePrice":"15,070","compareToPreviousClosePrice":"-265","compareToPreviousPrice":{"code":
