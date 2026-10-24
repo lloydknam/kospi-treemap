@@ -19,22 +19,22 @@ jobs:
       - name: Collect
         run: python -u collect.py 2>&1 | tee collect.log; exit ${PIPESTATUS[0]}
         shell: bash
-      - name: Render
-        run: python -u render.py data/kospi_mcap.csv kospi.mp4 --top 60 2>&1 | tee render.log; exit ${PIPESTATUS[0]}
+      - name: Render both
+        run: |
+          python -u render.py data/kospi_mcap.csv kospi.mp4 > render.log 2>&1 &
+          P1=$!
+          python -u render.py data/kospi_mcap.csv kospi_abs.mp4 --abs > render_abs.log 2>&1 &
+          P2=$!
+          wait $P1; E1=$?; wait $P2; E2=$?
+          echo "exit $E1 $E2"; tail -3 render.log render_abs.log
+          exit $((E1+E2))
         shell: bash
-      - name: Render absolute
-        run: python -u render.py data/kospi_mcap.csv kospi_abs.mp4 --top 60 --abs
-      - name: Save render log
+      - name: Save logs
         if: always()
         run: |
           git config user.name github-actions; git config user.email actions@github.com
-          mkdir -p logs; tail -c 5000 render.log > logs/render.log || true
-          git add logs; git diff --cached --quiet || git commit -qm 'render log'; git pull --rebase -q || true; git push || true
-      - name: Commit data
-        run: |
-          git config user.name "github-actions"; git config user.email "actions@github.com"
-          mkdir -p logs; tail -c 6000 collect.log > logs/collect.log
-          git add data logs; git diff --cached --quiet || git commit -m "data: update $(date +%F)"; git pull --rebase -q || true; git push || true
+          mkdir -p logs; tail -c 5000 collect.log > logs/collect.log || true; cat render.log render_abs.log 2>/dev/null | tail -c 4000 > logs/render.log || true
+          git add logs; git diff --cached --quiet || git commit -qm "logs"; git pull --rebase -q || true; git push || true
       - name: Release
         env: { GH_TOKEN: "${{ github.token }}" }
         run: |
