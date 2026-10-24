@@ -25,7 +25,10 @@ ap.add_argument("--abs", action="store_true")
 ap.add_argument("--note", default="")
 a = ap.parse_args()
 
-for f in ["Noto Sans CJK KR", "NanumGothic", "Malgun Gothic", "AppleGothic", "Noto Sans CJK JP"]:
+import glob, os
+for fp in glob.glob(os.path.join(os.path.dirname(os.path.abspath(__file__)), "fonts", "*.otf")):
+    fm.fontManager.addfont(fp)                      # Pretendard (OFL)
+for f in ["Pretendard", "Noto Sans CJK KR", "NanumGothic", "Malgun Gothic", "AppleGothic", "Noto Sans CJK JP"]:
     if any(f == x.name for x in fm.fontManager.ttflist):
         plt.rcParams["font.family"] = f; break
 plt.rcParams["axes.unicode_minus"] = False
@@ -67,7 +70,7 @@ def layout(day):
     sizes = squarify.normalize_sizes(vals.values, w_, h_)
     rects = squarify.squarify(sizes, (W - w_) / 2, (H - h_) / 2, w_, h_)   # 가운데 정렬
     pos = {t: (r["x"], r["y"], r["dx"], r["dy"]) for t, r in zip(vals.index, rects)}
-    return pos, d["chg"].to_dict(), vals.sum()
+    return pos, d["chg"].to_dict(), vals.sum(), (vals / 1e12).to_dict()
 
 L = [layout(d) for d in dates]
 
@@ -87,7 +90,7 @@ fig = plt.figure(figsize=(PX / 100, PX / 100), dpi=100, facecolor=BG)
 ax = fig.add_axes(TM)
 cx = fig.add_axes([0.075, 0.07, 0.89, 0.165], facecolor=BG)
 date_t = fig.text(0.025, 0.925, "", color=INK, fontsize=42, weight="bold", va="center")
-head_t = fig.text(0.975, 0.955, "KOSPI 시가총액 지도", color=INK, fontsize=17, weight="bold", ha="right", va="center")
+head_t = fig.text(0.975, 0.955, "KOSPI 시가총액 지도", color=INK, fontsize=17, weight="semibold", ha="right", va="center")
 sub1 = fig.text(0.975, 0.918, "", color=SOFT, fontsize=10.5, ha="right", va="center")
 sub2 = fig.text(0.975, 0.888, "", color=SOFT, fontsize=10.5, ha="right", va="center")
 fig.text(0.975, 0.012, "출처: 네이버 증권(종목·시가총액), Yahoo Finance(종가·KOSPI 지수) · 시총은 종가×주식수 근사치",
@@ -123,20 +126,25 @@ def chart(f, i, j, tot):
     for sp in ["top", "left", "right"]: cx.spines[sp].set_visible(False)
     cx.spines["bottom"].set_color("#c9cde0")
 
-def label(k, x, y, w, h, c):
+def fmt_cap(v):  # 조원 단위
+    if v >= 10: return f"{v:,.0f}조"
+    if v >= 1: return f"{v:.1f}조"
+    return f"{v:.2f}조"
+
+def label(k, x, y, w, h, m):
     nm = names.get(k, k)
     wp, hp = w * UPX, h * UPX
     if wp < 22 or hp < 12: return
-    tn = max(tw(nm), 3.8)
+    tn = max(tw(nm), 4.6)
     fw = wp * 0.9 / (tn * 1.39)
     fs2 = min(fw, hp * 0.82 / (2 * 1.39 * 1.2), 30)
     if fs2 >= 6.3:
-        ax.text(x + w / 2, y + h / 2, f"{nm}\n{c:+.1f}%", color=INK, ha="center", va="center",
-                fontsize=fs2, linespacing=1.15)
+        ax.text(x + w / 2, y + h / 2, f"{nm}\n{fmt_cap(m)}", color=INK, ha="center", va="center",
+                fontsize=fs2, linespacing=1.18, fontweight="medium")
         return
     fs1 = min(fw, hp * 0.8 / 1.39, 30)
     if fs1 >= 5.5:
-        ax.text(x + w / 2, y + h / 2, nm, color=INK, ha="center", va="center", fontsize=fs1)
+        ax.text(x + w / 2, y + h / 2, nm, color=INK, ha="center", va="center", fontsize=fs1, fontweight="medium")
 
 steps = max(N - 1, 1)
 for i in range(steps):
@@ -153,7 +161,9 @@ for i in range(steps):
             p0 = L[i][0].get(k, L[j][0].get(k)); p1 = L[j][0].get(k, p0)
             x, y, w, h = [p0[n] * (1 - f) + p1[n] * f for n in range(4)]
             c = L[i][1].get(k, 0) * (1 - f) + L[j][1].get(k, 0) * f
-            rects.append(Rectangle((x, y), w, h)); cs.append(c); geo.append((k, x, y, w, h, c))
+            m0 = L[i][3].get(k); m1 = L[j][3].get(k)
+            m = (m0 if m1 is None else m1) if (m0 is None or m1 is None) else m0 * (1 - f) + m1 * f
+            rects.append(Rectangle((x, y), w, h)); cs.append(c); geo.append((k, x, y, w, h, m))
         fc = cmap((np.clip(cs, -lim, lim) + lim) / (2 * lim))
         ax.add_collection(PatchCollection(rects, facecolors=fc, edgecolors=BG, linewidths=1.0))
         for g in geo: label(*g)
