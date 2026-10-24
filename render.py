@@ -109,12 +109,12 @@ def make_bg():
 fig = plt.figure(figsize=(PX / 100, PX / 100), dpi=100, facecolor=BG)
 fig.figimage(make_bg(), 0, 0, zorder=-10)
 ax = fig.add_axes(TM)
-cx = fig.add_axes([0.095, 0.07, 0.83, 0.165], facecolor="none")
+cx = fig.add_axes([0.095, 0.095, 0.83, 0.15], facecolor="none")
 date_t = fig.text(0.05, 0.925, "", color=HEAD, fontsize=42, weight="bold", va="center")
 head_t = fig.text(0.95, 0.955, "KOSPI 시가총액 지도", color=HEAD, fontsize=17, weight="semibold", ha="right", va="center")
 sub1 = fig.text(0.95, 0.918, "", color=SOFT, fontsize=10.5, ha="right", va="center")
 sub2 = fig.text(0.95, 0.888, "", color=SOFT, fontsize=10.5, ha="right", va="center")
-fig.text(0.95, 0.03, "출처: 네이버 증권(종목·시가총액), Yahoo Finance(종가·KOSPI 지수) · 시총은 종가×주식수 근사치",
+fig.text(0.95, 0.024, "출처: 네이버 증권(종목·시가총액), Yahoo Finance(종가·KOSPI 지수) · 시총은 종가×주식수 근사치",
          color="#b4e3d8", fontsize=8.5, ha="right", va="bottom")
 if a.note:
     fig.text(0.5, 0.55, a.note, color=INK, alpha=0.12, fontsize=70, ha="center", va="center", rotation=20, weight="bold", zorder=10)
