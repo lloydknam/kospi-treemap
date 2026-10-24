@@ -2,23 +2,90 @@ name: kospi-treemap
 on:
   workflow_dispatch:
   schedule:
-    - cron: "40 7 * * 1-5"   # 평일 16:40 KST (장 마감 후)
+    - cron: "30 9 * * 1-5"   # 평일 18:30 KST (장 마감·데이터 반영 후)
+
 permissions:
   contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: kospi-treemap
+  cancel-in-progress: false
+
 jobs:
-  build:
+  site:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      changed: ${{ steps.chk.outputs.changed }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install yfinance requests pandas numpy
+      - name: Collect
+        run: python -u collect.py 2>&1 | tee collect.log; exit ${PIPESTATUS[0]}
+        shell: bash
+      - name: Build site data
+        run: python build_web.py data/kospi_mcap.csv data/kospi_index.csv site/data.json --start 2025-04-01
+      - name: New trading day?
+        id: chk
+        env: { GH_TOKEN: "${{ github.token }}" }
+        shell: bash
+        run: |
+          NEW=$(python -c "import json;print(json.load(open('site/data.json'))['updated'])")
+          OLD=$(gh release view latest --json body --jq .body 2>/dev/null | grep -o 'updated [0-9-]*' | head -1 | cut -d' ' -f2 || true)
+          echo "new=$NEW old=$OLD"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "$NEW" != "$OLD" ]; then echo "changed=true" >> $GITHUB_OUTPUT; else echo "changed=false" >> $GITHUB_OUTPUT; fi
+          echo "$NEW" > site/.updated
+      - uses: actions/upload-pages-artifact@v3
+        if: steps.chk.outputs.changed == 'true'
+        with: { path: site }
+      - uses: actions/upload-artifact@v4
+        if: steps.chk.outputs.changed == 'true'
+        with:
+          name: csv
+          path: |
+            data/kospi_mcap.csv
+            data/kospi_index.csv
+      - name: Save logs
+        if: always()
+        run: |
+          git config user.name github-actions; git config user.email actions@github.com
+          mkdir -p logs; tail -c 5000 collect.log > logs/collect.log || true
+          git add logs; git diff --cached --quiet || git commit -qm "logs"; git pull --rebase -q || true; git push || true
+      - name: Failure alert (optional)
+        if: failure()
+        env: { TG_TOKEN: "${{ secrets.TG_BOT_TOKEN }}", TG_CHAT: "${{ secrets.TG_CHAT_ID }}" }
+        run: |
+          [ -n "$TG_TOKEN" ] && [ -n "$TG_CHAT" ] && curl -s "https://api.telegram.org/bot$TG_TOKEN/sendMessage" -d chat_id="$TG_CHAT" --data-urlencode text="⚠️ kospi-treemap 갱신 실패: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" >/dev/null || true
+
+  deploy:
+    needs: site
+    if: needs.site.outputs.changed == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.dep.outputs.page_url }}
+    steps:
+      - id: dep
+        uses: actions/deploy-pages@v4
+
+  video:
+    needs: site
+    if: needs.site.outputs.changed == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
+      - uses: actions/download-artifact@v4
+        with: { name: csv, path: data }
       - run: |
           (which ffmpeg && fc-list | grep -qi 'noto.*cjk') || timeout 180 sudo apt-get install -y --no-install-recommends ffmpeg fonts-noto-cjk || true
-          pip install yfinance requests squarify matplotlib pandas
-      - name: Collect
-        run: python -u collect.py 2>&1 | tee collect.log; exit ${PIPESTATUS[0]}
-        shell: bash
+          pip install requests squarify matplotlib pandas numpy
       - name: Render both
         run: |
           set +e
@@ -37,16 +104,11 @@ jobs:
         if: always()
         run: |
           git config user.name github-actions; git config user.email actions@github.com
-          mkdir -p logs; tail -c 5000 collect.log > logs/collect.log || true; cat step.log render.log render_abs.log 2>/dev/null | tail -c 4000 > logs/render.log || true
+          mkdir -p logs; cat step.log render.log render_abs.log 2>/dev/null | tail -c 4000 > logs/render.log || true
           git add logs; git diff --cached --quiet || git commit -qm "logs"; git pull --rebase -q || true; git push || true
       - name: Release
         env: { GH_TOKEN: "${{ github.token }}" }
         run: |
           gh release view latest >/dev/null 2>&1 || gh release create latest -t "KOSPI treemap (latest)" -n "자동 갱신"
+          gh release edit latest -n "자동 갱신 · updated $(python -c "import pandas as pd;print(pd.read_csv('data/kospi_mcap.csv',usecols=['date']).date.max())")"
           gh release upload latest kospi.mp4 kospi_abs.mp4 data/kospi_mcap.csv --clobber
-      - uses: actions/upload-artifact@v4
-        with:
-          name: kospi-mp4
-          path: |
-            kospi.mp4
-            kospi_abs.mp4

@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KOSPI 시가총액 지도</title>
+<meta name="description" content="코스피 전 종목 시가총액을 면적으로, 등락률을 색으로 보여주는 인터랙티브 트리맵. 매일 자동 갱신.">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<style>
+:root{
+  --ink:#2f3347; --soft:#7a7f96; --line:#e7ebf0; --teal:#17a58b; --teal-d:#0f8a74; --bg:#eef4f3;
+  --up:#d9455f; --down:#3a7bd5;
+}
+*{box-sizing:border-box}
+html{color-scheme:light}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Pretendard,-apple-system,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;-webkit-text-size-adjust:100%}
+.wrap{max-width:1040px;margin:0 auto;padding:16px}
+.frame{padding:4px;border-radius:26px;background:linear-gradient(135deg,#3cd0b4 0%,#15977f 55%,#085c52 100%);box-shadow:0 6px 24px rgba(8,92,82,.12)}
+.card{background:#fff;border-radius:22px;padding:22px 22px 14px}
+.head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+.date{font-weight:800;font-size:clamp(34px,7vw,64px);letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
+.date small{display:block;font-size:.3em;font-weight:600;color:var(--soft);letter-spacing:0;margin-top:6px}
+.title{text-align:right}
+.title h1{margin:0;font-size:clamp(16px,2.6vw,22px);font-weight:700}
+.title p{margin:4px 0 0;color:var(--soft);font-size:clamp(12px,1.8vw,14px)}
+.stage{position:relative;margin-top:14px;width:100%;aspect-ratio:100/64;touch-action:pan-y}
+canvas{display:block;width:100%;height:100%}
+#tm{border-radius:10px;background:#fff}
+.tip{position:absolute;pointer-events:none;z-index:5;background:rgba(255,255,255,.97);border:1px solid var(--line);border-radius:10px;box-shadow:0 6px 18px rgba(30,40,60,.14);padding:9px 12px;font-size:13px;line-height:1.5;min-width:150px;display:none}
+.tip b{font-size:15px}
+.tip .r{display:flex;justify-content:space-between;gap:16px;color:var(--soft)}
+.tip .r span:last-child{color:var(--ink);font-variant-numeric:tabular-nums;font-weight:600}
+.readout{display:flex;justify-content:space-between;align-items:flex-end;margin-top:14px;gap:12px;flex-wrap:wrap}
+.readout .k{font-size:12px;color:var(--soft);font-weight:600}
+.readout .v{font-size:clamp(22px,4vw,34px);font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.readout .v.cap{color:var(--teal-d)}
+.chart{position:relative;width:100%;aspect-ratio:100/17;margin-top:2px}
+.controls{display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap}
+button,select{font:inherit;color:var(--ink)}
+.play{width:42px;height:42px;border-radius:50%;border:0;background:linear-gradient(135deg,#3cd0b4,#15977f);color:#fff;font-size:16px;cursor:pointer;flex:none;display:grid;place-items:center}
+.play:focus-visible,.seg button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+input[type=range]{flex:1;min-width:140px;accent-color:var(--teal);height:28px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:#f6f9f9}
+.seg button{border:0;background:transparent;padding:7px 13px;font-size:13px;font-weight:600;color:var(--soft);cursor:pointer}
+.seg button.on{background:var(--teal);color:#fff}
+select{border:1px solid var(--line);border-radius:999px;padding:7px 10px;background:#f6f9f9;font-size:13px;font-weight:600}
+.legend{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--soft);margin-left:auto}
+.legend i{display:block;width:110px;height:10px;border-radius:5px;background:linear-gradient(90deg,#7fb8ff,#b9d8ff,#f6f4fa,#ffc6cf,#ff8fa3)}
+.foot{display:flex;justify-content:space-between;gap:12px;margin-top:12px;font-size:11.5px;color:var(--soft);flex-wrap:wrap}
+.foot .c{color:#4f8f84;font-weight:600}
+.note{max-width:1040px;margin:12px auto 0;padding:0 8px;font-size:12px;color:var(--soft);line-height:1.6}
+@media (max-width:620px){
+  .card{padding:16px 12px 10px}
+  .stage{aspect-ratio:100/92}
+  .chart{aspect-ratio:100/26}
+  .legend{display:none}
+  .title{text-align:left}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <div class="frame"><div class="card">
+  <div class="head">
+    <div class="date" id="date">—<small id="dow"></small></div>
+    <div class="title">
+      <h1>KOSPI 시가총액 지도</h1>
+      <p id="sub">면적 = 시가총액 · 색 = 전일대비 등락률</p>
+    </div>
+  </div>
+
+  <div class="stage" id="stage">
+    <canvas id="tm" aria-label="코스피 시가총액 트리맵"></canvas>
+    <div class="tip" id="tip"></div>
+  </div>
+
+  <div class="readout">
+    <div><div class="k">KOSPI 지수</div><div class="v" id="ixv">—</div></div>
+    <div style="text-align:right"><div class="k">전체 시가총액</div><div class="v cap" id="capv">—</div></div>
+  </div>
+  <div class="chart"><canvas id="ix" aria-label="코스피 지수 추이"></canvas></div>
+
+  <div class="controls">
+    <button class="play" id="play" aria-label="재생">▶</button>
+    <input type="range" id="slider" min="0" max="0" step="1" value="0" aria-label="날짜">
+    <div class="seg" id="mode" role="group" aria-label="면적 기준">
+      <button data-m="share" class="on">비중</button><button data-m="abs">절대 시총</button>
+    </div>
+    <select id="speed" aria-label="재생 속도">
+      <option value="5">느리게</option><option value="11" selected>보통</option><option value="24">빠르게</option><option value="48">아주 빠르게</option>
+    </select>
+    <div class="legend"><span>−3%</span><i></i><span>+3%</span></div>
+  </div>
+
+  <div class="foot">
+    <span class="c">@lloydknam · with Claude</span>
+    <span id="src">출처: 네이버 증권, Yahoo Finance</span>
+  </div>
+ </div></div>
+ <div class="note" id="note"></div>
+</div>
+
+<script>
+(() => {
+"use strict";
+const $ = id => document.getElementById(id);
+const LW = 1000, LH = 640;                       // 레이아웃 논리 좌표
+const INK = "#2f3347", SOFT = "#7a7f96", TEAL = "#17a58b";
+const STOPS = [[-3,[127,184,255]],[-1.5,[185,216,255]],[0,[246,244,250]],[1.5,[255,198,207]],[3,[255,143,163]]];
+function color(v){
+  v = Math.max(-3, Math.min(3, v));
+  for (let i = 1; i < STOPS.length; i++) if (v <= STOPS[i][0]) {
+    const [a, ca] = STOPS[i-1], [b, cb] = STOPS[i], t = (v - a) / (b - a);
+    return `rgb(${Math.round(ca[0]+(cb[0]-ca[0])*t)},${Math.round(ca[1]+(cb[1]-ca[1])*t)},${Math.round(ca[2]+(cb[2]-ca[2])*t)})`;
+  }
+}
+const DOW = ["일","월","화","수","목","금","토"];
+const fmtCap = m => m >= 10 ? Math.round(m).toLocaleString("ko-KR") + "조" : m >= 1 ? m.toFixed(1) + "조" : m.toFixed(2) + "조";
+
+let D, N, byCode = new Map(), total = [], maxTot = 1;
+let pos = 0, playing = false, speed = 11, mode = "share", last = 0, hover = null, cur = [];
+const cache = [];
+
+// ---------- squarify ----------
+function squarify(vals, W, H){
+  const s0 = vals.reduce((a,b) => a + b, 0), k = W * H / s0;
+  const ar = vals.map(v => v * k), out = new Array(ar.length);
+  let x = 0, y = 0, w = W, h = H, i = 0;
+  const worst = (s, mx, mn, side) => Math.max(side*side*mx/(s*s), s*s/(side*side*mn));
+  while (i < ar.length){
+    const side = Math.min(w, h);
+    let j = i, s = ar[i], mx = ar[i], mn = ar[i], wr = worst(s, mx, mn, side);
+    while (j + 1 < ar.length){
+      const ns = s + ar[j+1], nw = worst(ns, mx, ar[j+1], side);
+      if (nw > wr) break;
+      j++; s = ns; mn = ar[j]; wr = nw;
+    }
+    if (w >= h){                                  // 왼쪽에 세로 열
+      const cw = s / h; let yy = y;
+      for (let n = i; n <= j; n++){ const hh = ar[n] / cw; out[n] = [x, yy, cw, hh]; yy += hh; }
+      x += cw; w -= cw;
+    } else {                                      // 위쪽에 가로 줄
+      const rh = s / w; let xx = x;
+      for (let n = i; n <= j; n++){ const ww = ar[n] / rh; out[n] = [xx, y, ww, rh]; xx += ww; }
+      y += rh; h -= rh;
+    }
+    i = j + 1;
+  }
+  return out;
+}
+function layoutDay(i){
+  if (cache[i]) return cache[i];
+  const items = [];
+  for (const t of D.tickers){ const v = t.m[i]; if (v > 0) items.push([t, v]); }
+  items.sort((a,b) => b[1] - a[1]);
+  const rects = squarify(items.map(a => a[1]), LW, LH), m = new Map();
+  items.forEach((a, n) => m.set(a[0].c, rects[n]));
+  return cache[i] = m;
+}
+
+// ---------- 캔버스 ----------
+const tm = $("tm"), tctx = tm.getContext("2d"), ixc = $("ix"), ictx = ixc.getContext("2d");
+let cw = 0, ch = 0, dpr = 1, iw = 0, ih = 0;
+function resize(){
+  dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+  const r = tm.getBoundingClientRect(); cw = r.width; ch = r.height;
+  tm.width = Math.round(cw * dpr); tm.height = Math.round(ch * dpr);
+  const r2 = ixc.getBoundingClientRect(); iw = r2.width; ih = r2.height;
+  ixc.width = Math.round(iw * dpr); ixc.height = Math.round(ih * dpr);
+  draw();
+}
+new ResizeObserver(resize).observe($("stage"));
+
+function lerp(a, b, f){ return a + (b - a) * f; }
+function draw(){
+  if (!D) return;
+  const i = Math.min(Math.floor(pos), N - 1), j = Math.min(i + 1, N - 1), f = i === j ? 0 : pos - i;
+  const A = layoutDay(i), B = layoutDay(j);
+  const tot = lerp(total[i], total[j], f);
+  const kk = mode === "abs" ? Math.sqrt(tot / maxTot) : 1;
+  const sx = cw / LW, sy = ch / LH;
+  tctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  tctx.clearRect(0, 0, cw, ch);
+  tctx.fillStyle = "#fff"; tctx.fillRect(0, 0, cw, ch);
+
+  if (mode === "abs"){                            // 기간 최고 시총 = 점선 프레임
+    tctx.save(); tctx.strokeStyle = "#9bd3c8"; tctx.setLineDash([6, 5]); tctx.lineWidth = 1.2;
+    tctx.strokeRect(1, 1, cw - 2, ch - 2); tctx.restore();
+    tctx.fillStyle = "#4f8f84"; tctx.font = "600 11px Pretendard,sans-serif"; tctx.textAlign = "right"; tctx.textBaseline = "top";
+    tctx.fillText(`기간 최고 시총 ${Math.round(maxTot / 1e4).toLocaleString("ko-KR")}조원`, cw - 8, 6);
+  }
+  const ox = (LW - LW * kk) / 2, oy = (LH - LH * kk) / 2;
+  cur = [];
+  const seen = new Set();
+  for (const t of D.tickers){
+    const a = A.get(t.c), b = B.get(t.c);
+    if (!a && !b) continue;
+    const p = a && b ? [lerp(a[0],b[0],f), lerp(a[1],b[1],f), lerp(a[2],b[2],f), lerp(a[3],b[3],f)] : (a || b);
+    const x = (ox + p[0] * kk) * sx, y = (oy + p[1] * kk) * sy, w = p[2] * kk * sx, h = p[3] * kk * sy;
+    const c0 = t.r[i] == null ? 0 : t.r[i] / 100, c1 = t.r[j] == null ? c0 : t.r[j] / 100;
+    const chg = lerp(c0, c1, f);
+    const mc = lerp(t.m[i] || t.m[j] || 0, t.m[j] || t.m[i] || 0, f) / 1e4;  // 조원
+    cur.push({t, x, y, w, h, chg, mc});
+  }
+  for (const o of cur){
+    tctx.fillStyle = color(o.chg);
+    tctx.fillRect(o.x + .5, o.y + .5, Math.max(o.w - 1, 0), Math.max(o.h - 1, 0));
+  }
+  tctx.textAlign = "center"; tctx.textBaseline = "middle";
+  for (const o of cur){
+    if (o.w < 30 || o.h < 18) continue;
+    const name = o.t.n;
+    tctx.font = "700 12px Pretendard,sans-serif";
+    const per = tctx.measureText(name).width / 12;
+    const fs = Math.min(o.w * .9 / per, o.h * .34, 26);
+    const two = fs >= 9 && fs * 2.3 <= o.h;
+    const f1 = Math.min(o.w * .9 / per, o.h * .55, 13);
+    if (!two && f1 < 8.5) continue;
+    const cx = o.x + o.w / 2, cy = o.y + o.h / 2;
+    tctx.fillStyle = INK;
+    if (two){
+      tctx.font = `700 ${fs}px Pretendard,sans-serif`; tctx.fillText(name, cx, cy - fs * .55);
+      const cap = fmtCap(o.mc), fs2 = Math.min(fs * .85, o.w * .9 / (tctx.measureText(cap).width / fs));
+      tctx.font = `500 ${fs2}px Pretendard,sans-serif`; tctx.fillStyle = "rgba(47,51,71,.78)";
+      tctx.fillText(cap, cx, cy + fs * .62);
+    } else {
+      tctx.font = `700 ${f1}px Pretendard,sans-serif`; tctx.fillText(name, cx, cy);
+    }
+  }
+  if (hover){
+    const o = cur.find(q => q.t.c === hover);
+    if (o){ tctx.strokeStyle = TEAL; tctx.lineWidth = 2.2; tctx.strokeRect(o.x + 1, o.y + 1, o.w - 2, o.h - 2); }
+  }
+  drawIndex(i, j, f);
+  const di = Math.round(pos);
+  $("date").firstChild.nodeValue = D.dates[di];
+  const dt = new Date(D.dates[di] + "T00:00:00");
+  $("dow").textContent = DOW[dt.getDay()] + "요일";
+  $("capv").textContent = Math.round(tot / 1e4).toLocaleString("ko-KR") + "조원";
+  $("ixv").textContent = lerp(D.index[i], D.index[j], f).toLocaleString("ko-KR", {maximumFractionDigits: 0});
+  $("slider").value = di;
+}
+
+function drawIndex(i, j, f){
+  const c = ictx, W = iw, H = ih, padL = 4, padR = 4, padT = 6, padB = 18;
+  c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, W, H);
+  const lo = Math.min(...D.index), hi = Math.max(...D.index), span = hi - lo || 1;
+  const X = n => padL + (W - padL - padR) * n / (N - 1);
+  const Y = v => padT + (H - padT - padB) * (1 - (v - lo) / span);
+  c.beginPath(); D.index.forEach((v, n) => n ? c.lineTo(X(n), Y(v)) : c.moveTo(X(n), Y(v)));
+  c.strokeStyle = "#17a58b"; c.lineWidth = 1.8; c.lineJoin = "round"; c.stroke();
+  c.lineTo(X(N - 1), H - padB); c.lineTo(X(0), H - padB); c.closePath();
+  c.fillStyle = "rgba(60,208,180,.16)"; c.fill();
+  c.fillStyle = SOFT; c.font = "500 10.5px Pretendard,sans-serif"; c.textBaseline = "alphabetic";
+  let prev = "";
+  D.dates.forEach((d, n) => {
+    const ym = d.slice(0, 7), mo = +d.slice(5, 7);
+    if (ym !== prev){
+      prev = ym;
+      if ((mo - 1) % 3 === 0){
+        c.textAlign = n < 3 ? "left" : "center";
+        c.fillText(d.slice(2, 4) + "." + d.slice(5, 7), X(n), H - 4);
+      }
+    }
+  });
+  const p = i + f, px = X(p), v = lerp(D.index[i], D.index[j], f);
+  c.strokeStyle = "rgba(15,138,116,.5)"; c.lineWidth = 1; c.beginPath(); c.moveTo(px, padT); c.lineTo(px, H - padB); c.stroke();
+  c.fillStyle = "#0f8a74"; c.beginPath(); c.arc(px, Y(v), 4, 0, 7); c.fill();
+  c.strokeStyle = "#fff"; c.lineWidth = 2; c.stroke();
+}
+
+// ---------- 상호작용 ----------
+const tip = $("tip");
+function showTip(e){
+  const r = tm.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top;
+  let hit = null;
+  for (let n = cur.length - 1; n >= 0; n--){ const o = cur[n]; if (mx >= o.x && mx < o.x + o.w && my >= o.y && my < o.y + o.h){ hit = o; break; } }
+  const code = hit ? hit.t.c : null;
+  if (!hit){ tip.style.display = "none"; if (hover){ hover = null; if (!playing) draw(); } return; }
+  const i = Math.round(pos), tot = total[i] / 1e4;
+  const sign = hit.chg > 0 ? "+" : "";
+  tip.innerHTML = `<b>${hit.t.n}</b> <span style="color:${SOFT};font-size:12px">${hit.t.c}</span>
+    <div class="r"><span>시가총액</span><span>${fmtCap(hit.mc)}원</span></div>
+    <div class="r"><span>전체 비중</span><span>${(hit.mc / tot * 100).toFixed(2)}%</span></div>
+    <div class="r"><span>전일대비</span><span style="color:${hit.chg > 0 ? "var(--up)" : hit.chg < 0 ? "var(--down)" : "inherit"}">${sign}${hit.chg.toFixed(2)}%</span></div>`;
+  tip.style.display = "block";
+  const tw = tip.offsetWidth, th = tip.offsetHeight;
+  tip.style.left = Math.max(4, Math.min(mx + 14, cw - tw - 4)) + "px";
+  tip.style.top = Math.max(4, Math.min(my + 14, ch - th - 4)) + "px";
+  if (hover !== code){ hover = code; if (!playing) draw(); }
+}
+tm.addEventListener("pointermove", showTip);
+tm.addEventListener("pointerdown", showTip);
+tm.addEventListener("pointerleave", () => { tip.style.display = "none"; hover = null; if (!playing) draw(); });
+
+function setPlaying(on){
+  playing = on; $("play").textContent = on ? "❚❚" : "▶"; $("play").setAttribute("aria-label", on ? "일시정지" : "재생");
+  if (on){ if (pos >= N - 1) pos = 0; last = performance.now(); requestAnimationFrame(loop); } else saveHash();
+}
+function loop(t){
+  if (!playing) return;
+  pos = Math.min(N - 1, pos + (t - last) / 1000 * speed); last = t;
+  draw();
+  if (pos >= N - 1){ setPlaying(false); return; }
+  requestAnimationFrame(loop);
+}
+$("play").onclick = () => setPlaying(!playing);
+$("slider").addEventListener("input", e => { pos = +e.target.value; draw(); saveHash(); });
+$("speed").onchange = e => speed = +e.target.value;
+document.querySelectorAll("#mode button").forEach(b => b.onclick = () => {
+  mode = b.dataset.m;
+  document.querySelectorAll("#mode button").forEach(x => x.classList.toggle("on", x === b));
+  $("sub").textContent = mode === "abs" ? "면적 = 시가총액(절대값) · 점선 = 기간 최고 · 색 = 전일대비" : "면적 = 시가총액(비중) · 색 = 전일대비 등락률";
+  draw(); saveHash();
+});
+ixc.addEventListener("pointerdown", seek); ixc.addEventListener("pointermove", e => { if (e.buttons) seek(e); });
+function seek(e){
+  const r = ixc.getBoundingClientRect(), n = Math.round((e.clientX - r.left - 4) / (r.width - 8) * (N - 1));
+  pos = Math.max(0, Math.min(N - 1, n)); setPlaying(false); draw(); saveHash();
+}
+document.addEventListener("keydown", e => {
+  if (e.target.tagName === "SELECT") return;
+  if (e.code === "Space"){ e.preventDefault(); setPlaying(!playing); }
+  else if (e.code === "ArrowLeft" || e.code === "ArrowRight"){
+    pos = Math.max(0, Math.min(N - 1, Math.round(pos) + (e.code === "ArrowLeft" ? -1 : 1) * (e.shiftKey ? 10 : 1)));
+    draw(); saveHash();
+  }
+});
+let ht; function saveHash(){ clearTimeout(ht); ht = setTimeout(() => { try { history.replaceState(null, "", `#d=${D.dates[Math.round(pos)]}&m=${mode}`); } catch (_) {} }, 200); }
+
+// ---------- 시작 ----------
+fetch("data.json?v=" + Date.now()).then(r => r.json()).then(async d => {
+  D = d; N = d.dates.length;
+  total = d.dates.map((_, i) => d.tickers.reduce((s, t) => s + (t.m[i] || 0), 0));
+  maxTot = Math.max(...total);
+  $("slider").max = N - 1;
+  const h = new URLSearchParams(location.hash.slice(1));
+  pos = N - 1;
+  if (h.get("d")){ const k = d.dates.indexOf(h.get("d")); if (k >= 0) pos = k; }
+  if (h.get("m") === "abs") document.querySelector('#mode button[data-m="abs"]').click();
+  $("src").textContent = `출처: 네이버 증권·Yahoo Finance · 종가×주식수 근사치 · 데이터 기준 ${d.updated}`;
+  $("note").textContent = `${d.dates[0]} ~ ${d.updated} · ${d.tickers.length.toLocaleString()}개 종목(우선주 포함). 매 평일 장 마감 후 자동 갱신됩니다. 시가총액은 종가에 현재 주식수(상위 종목은 증자·소각 반영)를 곱한 근사치라 KRX 공식 수치와 다를 수 있습니다. 단축키: 스페이스 재생, ←/→ 하루 이동(Shift는 10일).`;
+  try { await document.fonts.load("700 14px Pretendard"); await document.fonts.load("500 14px Pretendard"); } catch (_) {}
+  resize();
+}).catch(e => { $("date").firstChild.nodeValue = "데이터를 불러오지 못했어요"; console.error(e); });
+})();
+</script>
+</body>
+</html>
