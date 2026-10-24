@@ -65,7 +65,7 @@ def layout(day):
     k = (vals.sum() / REF) ** 0.5 if a.abs else 1.0
     w_, h_ = W * k, H * k
     sizes = squarify.normalize_sizes(vals.values, w_, h_)
-    rects = squarify.squarify(sizes, 0, H - h_, w_, h_)
+    rects = squarify.squarify(sizes, (W - w_) / 2, (H - h_) / 2, w_, h_)   # 가운데 정렬
     pos = {t: (r["x"], r["y"], r["dx"], r["dy"]) for t, r in zip(vals.index, rects)}
     return pos, d["chg"].to_dict(), vals.sum()
 
@@ -90,15 +90,17 @@ date_t = fig.text(0.025, 0.925, "", color=INK, fontsize=42, weight="bold", va="c
 head_t = fig.text(0.975, 0.955, "KOSPI 시가총액 지도", color=INK, fontsize=17, weight="bold", ha="right", va="center")
 sub1 = fig.text(0.975, 0.918, "", color=SOFT, fontsize=10.5, ha="right", va="center")
 sub2 = fig.text(0.975, 0.888, "", color=SOFT, fontsize=10.5, ha="right", va="center")
+fig.text(0.975, 0.012, "출처: 네이버 증권(종목·시가총액), Yahoo Finance(종가·KOSPI 지수) · 시총은 종가×주식수 근사치",
+         color="#a3a8bd", fontsize=8.5, ha="right", va="bottom")
 if a.note:
     fig.text(0.5, 0.55, a.note, color=INK, alpha=0.12, fontsize=70, ha="center", va="center", rotation=20, weight="bold", zorder=10)
 
 ymin, ymax = np.nanmin(ixv), np.nanmax(ixv)
 pad = (ymax - ymin) * 0.12
 
-def chart(f, i, j):
+def chart(f, i, j, tot):
     cx.clear(); cx.set_facecolor(BG)
-    cx.set_xlim(xn[0], xn[-1]); cx.set_ylim(ymin - pad, ymax + pad)
+    cx.set_xlim(xn[0], xn[-1]); cx.set_ylim(ymin - pad, ymax + pad * 2.6)
     cx.plot(xn, ixv, color="#d5d8e6", lw=2.2, solid_capstyle="round")
     k = i + 1
     px = list(xn[:k]) + [xn[i] * (1 - f) + xn[j] * f]
@@ -106,8 +108,10 @@ def chart(f, i, j):
     cx.fill_between(px, py, ymin - pad, color="#ffc6cf", alpha=0.35, lw=0)
     cx.plot(px, py, color="#ff8fa3", lw=2.6, solid_capstyle="round")
     cx.plot([px[-1]], [py[-1]], "o", ms=9, color="white", mec="#ff6f8a", mew=2.6, zorder=5)
-    cx.text(0.01, 0.95, "KOSPI 지수", transform=cx.transAxes, color=SOFT, fontsize=10.5, va="top")
-    cx.text(0.115, 0.97, f"{py[-1]:,.0f}", transform=cx.transAxes, color=INK, fontsize=16, weight="bold", va="top")
+    cx.text(0.005, 0.97, "KOSPI 지수", transform=cx.transAxes, color=SOFT, fontsize=14, va="top")
+    cx.text(0.175, 0.99, f"{py[-1]:,.0f}", transform=cx.transAxes, color=INK, fontsize=23, weight="bold", va="top")
+    cx.text(0.345, 0.97, "시총", transform=cx.transAxes, color=SOFT, fontsize=14, va="top")
+    cx.text(0.405, 0.99, f"{tot:,.0f}조원", transform=cx.transAxes, color="#e0526d", fontsize=23, weight="bold", va="top")
     cx.xaxis.set_major_locator(mdates.MonthLocator(bymonth=(1, 4, 7, 10)))
     cx.xaxis.set_major_formatter(mdates.DateFormatter("%Y.%m"))
     cx.xaxis.set_minor_locator(mdates.MonthLocator())
@@ -160,7 +164,7 @@ for i in range(steps):
                       + f" · 색={unit} 등락률")
         sub2.set_text(f"{'전체' if not a.top else '상위 ' + str(a.top) + '개'} {len(topn)}종목 합계 {tot:,.0f}조원"
                       + (" · 매주 금요일 종가" if a.freq == "weekly" else ""))
-        chart(f, i, j)
+        chart(f, i, j, tot)
         fig.canvas.draw()
         ff.stdin.write(np.asarray(fig.canvas.buffer_rgba())[:, :, :3].tobytes())
 ff.stdin.close(); ff.wait()
