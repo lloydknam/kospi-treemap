@@ -22,6 +22,7 @@ ap.add_argument("--start", default="2025-01-01")
 ap.add_argument("--sub", type=int, default=2, help="구간당 보간 프레임 (작을수록 빠름)")
 ap.add_argument("--fps", type=int, default=24)
 ap.add_argument("--abs", action="store_true")
+ap.add_argument("--credit", default="@lloydknam · with Claude")
 ap.add_argument("--note", default="")
 a = ap.parse_args()
 
@@ -74,7 +75,7 @@ def layout(day):
 
 L = [layout(d) for d in dates]
 
-BG, INK, SOFT, HEAD = "#169983", "#2f3347", "#cdeee6", "#ffffff"   # BG=칸 사이 틈 색(청록), INK=칸 안 글자
+BG, INK, SOFT, HEAD = "#ffffff", "#2f3347", "#7a7f96", "#2f3347"   # 흰 배경, 칸 사이 틈=흰색
 cmap = matplotlib.colors.LinearSegmentedColormap.from_list(
     "pastel", ["#7fb8ff", "#b9d8ff", "#f6f4fa", "#ffc6cf", "#ff8fa3"])
 
@@ -87,7 +88,7 @@ ff = subprocess.Popen(
      "-pix_fmt", "yuv420p", a.out], stdin=subprocess.PIPE)
 
 def make_bg():
-    """청록 그라데이션 배경 + 얇은 그라데이션 테두리(크림→민트→피치)"""
+    """흰 배경 + 얇은 청록 그라데이션 테두리"""
     from PIL import Image, ImageDraw
     yy, xx = np.mgrid[0:PX, 0:PX]
     t = xx / PX * 0.25 + yy / PX * 0.75
@@ -97,8 +98,8 @@ def make_bg():
             m = (t >= p) & (t <= q); u = ((t - p) / (q - p))[m][:, None]
             out[m] = np.array(ca) * (1 - u) + np.array(cb) * u
         return out
-    base = lerp(t, [(0, (33, 182, 153)), (0.5, (21, 151, 127)), (1.0, (12, 108, 96))])
-    bd = lerp(xx / PX * 0.45 + yy / PX * 0.55, [(0, (255, 243, 209)), (0.5, (155, 240, 208)), (1.0, (255, 177, 153))])
+    base = np.full((PX, PX, 3), 255.0)   # 흰 배경
+    bd = lerp(xx / PX * 0.45 + yy / PX * 0.55, [(0, (60, 208, 180)), (0.5, (21, 151, 127)), (1.0, (8, 92, 82))])   # 청록 그라데이션
     S, inset, th, rad = 4, 14, 4, 26
     mk = Image.new("L", (PX * S, PX * S), 0)
     ImageDraw.Draw(mk).rounded_rectangle([inset * S, inset * S, (PX - inset) * S - 1, (PX - inset) * S - 1],
@@ -115,7 +116,9 @@ head_t = fig.text(0.95, 0.955, "KOSPI 시가총액 지도", color=HEAD, fontsize
 sub1 = fig.text(0.95, 0.918, "", color=SOFT, fontsize=10.5, ha="right", va="center")
 sub2 = fig.text(0.95, 0.888, "", color=SOFT, fontsize=10.5, ha="right", va="center")
 fig.text(0.95, 0.024, "출처: 네이버 증권(종목·시가총액), Yahoo Finance(종가·KOSPI 지수) · 시총은 종가×주식수 근사치",
-         color="#b4e3d8", fontsize=8.5, ha="right", va="bottom")
+         color="#a3a8bd", fontsize=8.5, ha="right", va="bottom")
+if a.credit:
+    fig.text(0.05, 0.024, a.credit, color="#4f8f84", fontsize=9.5, ha="left", va="bottom", fontweight="medium")
 if a.note:
     fig.text(0.5, 0.55, a.note, color=INK, alpha=0.12, fontsize=70, ha="center", va="center", rotation=20, weight="bold", zorder=10)
 
@@ -125,27 +128,27 @@ pad = (ymax - ymin) * 0.12
 def chart(f, i, j, tot):
     cx.clear(); cx.set_facecolor("none")
     cx.set_xlim(xn[0], xn[-1]); cx.set_ylim(ymin - pad, ymax + pad * 2.6)
-    cx.plot(xn, ixv, color="#ffffff", alpha=0.32, lw=2.2, solid_capstyle="round")
+    cx.plot(xn, ixv, color="#d5d8e6", lw=2.2, solid_capstyle="round")
     k = i + 1
     px = list(xn[:k]) + [xn[i] * (1 - f) + xn[j] * f]
     py = list(ixv[:k]) + [ixv[i] * (1 - f) + ixv[j] * f]
-    cx.fill_between(px, py, ymin - pad, color="#ffe9a8", alpha=0.22, lw=0)
-    cx.plot(px, py, color="#ffe9a8", lw=2.6, solid_capstyle="round")
-    cx.plot([px[-1]], [py[-1]], "o", ms=9, color="white", mec="#ff9e80", mew=2.6, zorder=5)
+    cx.fill_between(px, py, ymin - pad, color="#3cd0b4", alpha=0.18, lw=0)
+    cx.plot(px, py, color="#17a58b", lw=2.6, solid_capstyle="round")
+    cx.plot([px[-1]], [py[-1]], "o", ms=9, color="white", mec="#0f8a74", mew=2.6, zorder=5)
     cx.text(0.005, 0.97, "KOSPI 지수", transform=cx.transAxes, color=SOFT, fontsize=14, va="top")
     cx.text(0.175, 0.99, f"{py[-1]:,.0f}", transform=cx.transAxes, color=HEAD, fontsize=23, weight="bold", va="top")
     cx.text(0.345, 0.97, "시총", transform=cx.transAxes, color=SOFT, fontsize=14, va="top")
-    cx.text(0.405, 0.99, f"{tot:,.0f}조원", transform=cx.transAxes, color="#ffd9a0", fontsize=23, weight="bold", va="top")
+    cx.text(0.405, 0.99, f"{tot:,.0f}조원", transform=cx.transAxes, color="#0f8a74", fontsize=23, weight="bold", va="top")
     cx.xaxis.set_major_locator(mdates.MonthLocator(bymonth=(1, 4, 7, 10)))
     cx.xaxis.set_major_formatter(mdates.DateFormatter("%Y.%m"))
     cx.xaxis.set_minor_locator(mdates.MonthLocator())
-    cx.tick_params(axis="x", which="major", length=6, color="#9fdccd", labelsize=9, labelcolor=SOFT)
-    cx.tick_params(axis="x", which="minor", length=3, color="#6fc4b2")
+    cx.tick_params(axis="x", which="major", length=6, color="#9aa0b8", labelsize=9, labelcolor=SOFT)
+    cx.tick_params(axis="x", which="minor", length=3, color="#c9cde0")
     cx.tick_params(axis="y", length=0, labelsize=8.5, labelcolor=SOFT)
     cx.yaxis.tick_right()
-    cx.grid(axis="y", color="#ffffff", alpha=0.14, lw=1)
+    cx.grid(axis="y", color="#eceef6", lw=1)
     for sp in ["top", "left", "right"]: cx.spines[sp].set_visible(False)
-    cx.spines["bottom"].set_color("#8fd6c6")
+    cx.spines["bottom"].set_color("#c9cde0")
 
 def fmt_cap(v):  # 조원 단위
     if v >= 10: return f"{v:,.0f}조"
@@ -175,7 +178,7 @@ for i in range(steps):
         f = min(s / a.sub, 1.0)
         ax.clear(); ax.axis("off"); ax.set_xlim(0, W); ax.set_ylim(H, 0)
         if a.abs:
-            ax.add_patch(Rectangle((0, 0), W, H, fill=False, ec="#9fe3d3", lw=1.5, ls="--"))
+            ax.add_patch(Rectangle((0, 0), W, H, fill=False, ec="#c9cde0", lw=1.5, ls="--"))
         keys = list(set(L[i][0]) | set(L[j][0]))
         rects, cs, geo = [], [], []
         for k in keys:
