@@ -1,26 +1,17 @@
-import yfinance as yf, requests, re, warnings, json
-warnings.filterwarnings("ignore")
-from yfinance import EquityQuery
-try:
-    q = EquityQuery("eq", ["exchange", "KSC"])
-    rows = []
-    for off in range(0, 1500, 250):
-        r = yf.screen(q, size=250, offset=off, sortField="intradaymarketcap", sortAsc=False)
-        qs = r.get("quotes", [])
-        if off == 0: print("total", r.get("total"), "keys", list(qs[0].keys())[:40])
-        rows += qs
-        if len(qs) < 250: break
-    print("rows", len(rows))
-    for x in rows[:4]: print(x.get("symbol"), x.get("shortName"), x.get("marketCap"), x.get("quoteType"), x.get("sharesOutstanding"))
-    print("quoteTypes", {t: sum(1 for x in rows if x.get("quoteType") == t) for t in set(x.get("quoteType") for x in rows)})
-    print("code0", sum(1 for x in rows if x["symbol"].split(".")[0].endswith("0")))
-except Exception as e:
-    print("screen ERR", repr(e)[:300])
+import requests, json
 H = {"User-Agent": "Mozilla/5.0"}
-for u in ["https://m.stock.naver.com/api/stocks/marketValue/KOSPI?page=1&pageSize=100",
-          "https://m.stock.naver.com/api/stocks/marketValue/KOSPI?page=9&pageSize=100"]:
-    try:
-        r = requests.get(u, headers=H, timeout=20)
-        print(u[-30:], r.status_code, len(r.text), r.text[:300].replace("\n", " "))
-    except Exception as e:
-        print("naver ERR", repr(e)[:200])
+r = requests.get("https://m.stock.naver.com/api/stocks/marketValue/KOSPI?page=1&pageSize=100", headers=H, timeout=20).json()
+print({k: v for k, v in r.items() if k != "stocks"})
+print(json.dumps(r["stocks"][0], ensure_ascii=False))
+print(json.dumps(r["stocks"][1], ensure_ascii=False)[:600])
+allr = []
+for p in range(1, 15):
+    j = requests.get(f"https://m.stock.naver.com/api/stocks/marketValue/KOSPI?page={p}&pageSize=100", headers=H, timeout=20).json()
+    s = j.get("stocks", [])
+    allr += s
+    if len(s) < 100: break
+print("pages", p, "n", len(allr))
+from collections import Counter
+print(Counter(x["stockEndType"] for x in allr))
+print([ (x["itemCode"], x["stockName"], x.get("marketValue")) for x in allr if x["stockEndType"]=="stock"][-3:])
+print(sum(1 for x in allr if x["stockEndType"]=="stock" and x["itemCode"].endswith("0")))
