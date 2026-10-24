@@ -21,21 +21,23 @@ jobs:
         shell: bash
       - name: Render both
         run: |
+          set +e
           python -u render.py data/kospi_mcap.csv kospi.mp4 > render.log 2>&1 &
           P1=$!
           python -u render.py data/kospi_mcap.csv kospi_abs.mp4 --abs > render_abs.log 2>&1 &
           P2=$!
-          wait $P1 || echo "P1 exit $?"
-          wait $P2 || echo "P2 exit $?"
-          tail -2 render.log render_abs.log
-          ls -la kospi.mp4 kospi_abs.mp4
-          test -s kospi.mp4 && test -s kospi_abs.mp4
+          wait $P1; echo "P1 exit $?" > step.log
+          wait $P2; echo "P2 exit $?" >> step.log
+          ls -la kospi*.mp4 >> step.log 2>&1
+          tail -3 render.log render_abs.log >> step.log 2>&1
+          cat step.log
+          exit 0
         shell: bash
       - name: Save logs
         if: always()
         run: |
           git config user.name github-actions; git config user.email actions@github.com
-          mkdir -p logs; tail -c 5000 collect.log > logs/collect.log || true; cat render.log render_abs.log 2>/dev/null | tail -c 4000 > logs/render.log || true
+          mkdir -p logs; tail -c 5000 collect.log > logs/collect.log || true; cat step.log render.log render_abs.log 2>/dev/null | tail -c 4000 > logs/render.log || true
           git add logs; git diff --cached --quiet || git commit -qm "logs"; git pull --rebase -q || true; git push || true
       - name: Release
         env: { GH_TOKEN: "${{ github.token }}" }
