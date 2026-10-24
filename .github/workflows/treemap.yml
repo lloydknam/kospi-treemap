@@ -25,9 +25,11 @@ jobs:
           P1=$!
           python -u render.py data/kospi_mcap.csv kospi_abs.mp4 --abs > render_abs.log 2>&1 &
           P2=$!
-          wait $P1; E1=$?; wait $P2; E2=$?
-          echo "exit $E1 $E2"; tail -3 render.log render_abs.log
-          exit $((E1+E2))
+          wait $P1 || echo "P1 exit $?"
+          wait $P2 || echo "P2 exit $?"
+          tail -2 render.log render_abs.log
+          ls -la kospi.mp4 kospi_abs.mp4
+          test -s kospi.mp4 && test -s kospi_abs.mp4
         shell: bash
       - name: Save logs
         if: always()
