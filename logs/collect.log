@@ -16,7 +16,7 @@ share-ratio tickers 116
 dropped 32
   drop ('007070', 'GS리테일', 'jump', np.float64(0.34))
   drop ('005180', '빙그레', 'jump', np.float64(0.54))
-  drop ('094800', '맵스리얼티', 'jump', np.float64(0.45))
+  drop ('094800', '맵스리얼티', 'jump', np.float64(0.47))
   drop ('003620', 'KG모빌리티', 'jump', np.float64(0.8))
   drop ('161000', '애경케미칼', 'jump', np.float64(0.59))
   drop ('004710', '한솔테크닉스', 'px mismatch', np.float64(1.05))
