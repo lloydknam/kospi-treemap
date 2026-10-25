@@ -65,7 +65,7 @@ select{border:1px solid var(--line);border-radius:999px;padding:7px 10px;backgro
     <div class="date" id="date">—<small id="dow"></small></div>
     <div class="title">
       <h1>KOSPI 시가총액 지도</h1>
-      <p id="sub">면적 = 시가총액 · 색 = 전일대비 등락률</p>
+      <p id="sub">면적 = 시가총액(절대값) · 점선 = 기간 최고 · 색 = 전일대비</p>
     </div>
   </div>
 
@@ -84,7 +84,7 @@ select{border:1px solid var(--line);border-radius:999px;padding:7px 10px;backgro
     <button class="play" id="play" aria-label="재생">▶</button>
     <input type="range" id="slider" min="0" max="0" step="1" value="0" aria-label="날짜">
     <div class="seg" id="mode" role="group" aria-label="면적 기준">
-      <button data-m="share" class="on">비중</button><button data-m="abs">절대 시총</button>
+      <button data-m="abs" class="on">절대 시총</button><button data-m="share">비중</button>
     </div>
     <select id="speed" aria-label="재생 속도">
       <option value="5">느리게</option><option value="11" selected>보통</option><option value="24">빠르게</option><option value="48">아주 빠르게</option>
@@ -118,7 +118,7 @@ const DOW = ["일","월","화","수","목","금","토"];
 const fmtCap = m => m >= 10 ? Math.round(m).toLocaleString("ko-KR") + "조" : m >= 1 ? m.toFixed(1) + "조" : m.toFixed(2) + "조";
 
 let D, N, byCode = new Map(), total = [], maxTot = 1;
-let pos = 0, playing = false, speed = 11, mode = "share", last = 0, hover = null, cur = [];
+let pos = 0, playing = false, speed = 11, mode = "abs", last = 0, hover = null, cur = [];
 const cache = [];
 
 // ---------- squarify ----------
@@ -337,7 +337,7 @@ fetch("data.json?v=" + Date.now()).then(r => r.json()).then(async d => {
   const h = new URLSearchParams(location.hash.slice(1));
   pos = N - 1;
   if (h.get("d")){ const k = d.dates.indexOf(h.get("d")); if (k >= 0) pos = k; }
-  if (h.get("m") === "abs") document.querySelector('#mode button[data-m="abs"]').click();
+  if (h.get("m") === "share") document.querySelector('#mode button[data-m="share"]').click();
   $("src").textContent = `출처: 네이버 증권·Yahoo Finance · 종가×주식수 근사치 · 데이터 기준 ${d.updated}`;
   $("note").textContent = `${d.dates[0]} ~ ${d.updated} · ${d.tickers.length.toLocaleString()}개 종목(우선주 포함). 매 평일 장 마감 후 자동 갱신됩니다. 시가총액은 종가에 현재 주식수(상위 종목은 증자·소각 반영)를 곱한 근사치라 KRX 공식 수치와 다를 수 있습니다. 단축키: 스페이스 재생, ←/→ 하루 이동(Shift는 10일).`;
   try { await document.fonts.load("700 14px Pretendard"); await document.fonts.load("500 14px Pretendard"); } catch (_) {}
