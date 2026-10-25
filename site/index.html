@@ -23,7 +23,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:Pretendard,-appl
 .title{text-align:right}
 .title h1{margin:0;font-size:clamp(16px,2.6vw,22px);font-weight:700}
 .title p{margin:4px 0 0;color:var(--soft);font-size:clamp(12px,1.8vw,14px)}
-.stage{position:relative;margin-top:14px;width:100%;aspect-ratio:100/64;touch-action:pan-y}
+.stage{position:relative;margin-top:14px;width:100%;aspect-ratio:100/64;max-height:max(260px,calc(100vh - var(--chrome,480px)));touch-action:pan-y}
 canvas{display:block;width:100%;height:100%}
 #tm{border-radius:10px;background:#fff}
 .tip{position:absolute;pointer-events:none;z-index:5;background:rgba(255,255,255,.97);border:1px solid var(--line);border-radius:10px;box-shadow:0 6px 18px rgba(30,40,60,.14);padding:9px 12px;font-size:13px;line-height:1.5;min-width:150px;display:none}
@@ -34,7 +34,7 @@ canvas{display:block;width:100%;height:100%}
 .readout .k{font-size:12px;color:var(--soft);font-weight:600}
 .readout .v{font-size:clamp(30px,6.2vw,56px);font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
 .readout .v.cap{color:var(--teal-d)}
-.chart{position:relative;width:100%;aspect-ratio:100/17;margin-top:2px}
+.chart{position:relative;width:100%;aspect-ratio:100/17;max-height:150px;margin-top:2px}
 .controls{display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap}
 button,select{font:inherit;color:var(--ink)}
 .play{width:42px;height:42px;border-radius:50%;border:0;background:linear-gradient(135deg,#3cd0b4,#15977f);color:#fff;font-size:16px;cursor:pointer;flex:none;display:grid;place-items:center}
@@ -54,6 +54,18 @@ select{border:1px solid var(--line);border-radius:999px;padding:7px 10px;backgro
 .site-foot .c{display:inline-block;line-height:0}.site-foot .c img{display:block;height:40px;width:auto;max-width:100%}.site-foot .c:hover{opacity:.85}
 .hitsrow{text-align:center}.hits{display:inline-block;line-height:0}.hits img{height:20px;width:auto}
 .note{max-width:1040px;margin:12px auto 0;padding:0 8px;font-size:12px;color:var(--soft);line-height:1.6}
+@media (min-width:621px) and (max-height:820px){
+  .wrap{padding:8px}
+  .card{padding:12px 16px 8px}
+  .date{font-size:clamp(24px,3.2vw,34px)}
+  .date small{margin-top:3px}
+  .stage{margin-top:8px;max-height:max(190px,calc(100vh - 335px))}
+  .readout{margin-top:6px}
+  .readout .v{font-size:clamp(24px,4vw,40px)}
+  .chart{max-height:78px}
+  .controls{margin-top:6px}
+  .foot{margin-top:6px}
+}
 @media (max-width:620px){
   .wrap{padding:3px}
   .frame{padding:3px;border-radius:22px}
