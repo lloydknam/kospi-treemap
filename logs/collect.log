@@ -1,18 +1,21 @@
 naver stocks 942
-batch 0 got 80
-batch 80 got 160
-batch 160 got 240
-batch 240 got 320
-batch 320 got 400
-batch 400 got 480
-batch 480 got 560
-batch 560 got 640
-batch 640 got 720
-batch 720 got 800
-batch 800 got 880
-batch 880 got 942
-tickers with prices 942 of 942
-share-ratio tickers 116
+
+1 Failed download:
+['000810.KS']: OperationalError('database is locked')
+batch 0 got 79
+batch 80 got 159
+batch 160 got 239
+batch 240 got 319
+batch 320 got 399
+batch 400 got 479
+batch 480 got 559
+batch 560 got 639
+batch 640 got 719
+batch 720 got 799
+batch 800 got 879
+batch 880 got 941
+tickers with prices 941 of 942
+share-ratio tickers 115
 dropped 32
   drop ('007070', 'GS리테일', 'jump', np.float64(0.34))
   drop ('005180', '빙그레', 'jump', np.float64(0.54))
@@ -46,5 +49,5 @@ dropped 32
   drop ('019685', '대교우B', 'jump', np.float64(1.08))
   drop ('145210', '다이나믹디자인', 'jump', np.float64(9.0))
   drop ('004415', '서울식품우', 'jump', np.float64(0.45))
-saved 400121 rows 445 days 910 tickers
+saved 399677 rows 445 days 909 tickers
 index rows 445
