@@ -22,7 +22,7 @@ ap.add_argument("--start", default="2025-01-01")
 ap.add_argument("--sub", type=int, default=2, help="구간당 보간 프레임 (작을수록 빠름)")
 ap.add_argument("--fps", type=int, default=24)
 ap.add_argument("--abs", action="store_true")
-ap.add_argument("--credit", default="Lloyd’s Balcony Lab · with Claude\nGitHub(@lloydknam)")
+ap.add_argument("--credit", default="Lloyd's balcony lab\nwith claude · GitHub(@lloydknam)")
 ap.add_argument("--note", default="")
 a = ap.parse_args()
 
@@ -55,7 +55,7 @@ ixv = ix.reindex(pd.DatetimeIndex(dates), method="ffill").values
 xn = mdates.date2num(pd.DatetimeIndex(dates).to_pydatetime())
 
 PX = 1000
-TM = [0.04, 0.285, 0.92, 0.575]
+TM = [0.03, 0.285, 0.94, 0.575]
 W = 100.0
 H = W * (TM[3] * PX) / (TM[2] * PX)
 UPX = TM[2] * PX / W            # 좌표 1단위 = 픽셀
@@ -100,7 +100,7 @@ def make_bg():
         return out
     base = np.full((PX, PX, 3), 255.0)   # 흰 배경
     bd = lerp(xx / PX * 0.45 + yy / PX * 0.55, [(0, (60, 208, 180)), (0.5, (21, 151, 127)), (1.0, (8, 92, 82))])   # 청록 그라데이션
-    S, inset, th, rad = 4, 14, 4, 26
+    S, inset, th, rad = 4, 5, 4, 20
     mk = Image.new("L", (PX * S, PX * S), 0)
     ImageDraw.Draw(mk).rounded_rectangle([inset * S, inset * S, (PX - inset) * S - 1, (PX - inset) * S - 1],
                                          radius=rad * S, outline=255, width=th * S)
@@ -110,15 +110,15 @@ def make_bg():
 fig = plt.figure(figsize=(PX / 100, PX / 100), dpi=100, facecolor=BG)
 fig.figimage(make_bg(), 0, 0, zorder=-10)
 ax = fig.add_axes(TM)
-cx = fig.add_axes([0.095, 0.095, 0.83, 0.15], facecolor="none")
-date_t = fig.text(0.05, 0.925, "", color=HEAD, fontsize=30, weight="bold", va="center")
-head_t = fig.text(0.95, 0.955, "KOSPI 시가총액 지도", color=HEAD, fontsize=17, weight="semibold", ha="right", va="center")
-sub1 = fig.text(0.95, 0.918, "", color=SOFT, fontsize=10.5, ha="right", va="center")
-sub2 = fig.text(0.95, 0.888, "", color=SOFT, fontsize=10.5, ha="right", va="center")
-fig.text(0.95, 0.024, "출처: 네이버 증권(종목·시가총액), Yahoo Finance(종가·KOSPI 지수) · 시총은 종가×주식수 근사치",
+cx = fig.add_axes([0.085, 0.095, 0.85, 0.15], facecolor="none")
+date_t = fig.text(0.035, 0.925, "", color=HEAD, fontsize=30, weight="bold", va="center")
+head_t = fig.text(0.965, 0.955, "KOSPI 시가총액 지도", color=HEAD, fontsize=17, weight="semibold", ha="right", va="center")
+sub1 = fig.text(0.965, 0.918, "", color=SOFT, fontsize=10.5, ha="right", va="center")
+sub2 = fig.text(0.965, 0.888, "", color=SOFT, fontsize=10.5, ha="right", va="center")
+fig.text(0.965, 0.024, "출처: 네이버 증권(종목·시가총액), Yahoo Finance(종가·KOSPI 지수) · 시총은 종가×주식수 근사치",
          color="#a3a8bd", fontsize=8.5, ha="right", va="bottom")
 if a.credit:
-    fig.text(0.05, 0.024, a.credit, color="#4f8f84", fontsize=8.8, ha="left", va="bottom", fontweight="medium", linespacing=1.3)
+    fig.text(0.035, 0.024, a.credit, color="#4f8f84", fontsize=8.8, ha="left", va="bottom", fontweight="medium", linespacing=1.3)
 if a.note:
     fig.text(0.5, 0.55, a.note, color=INK, alpha=0.12, fontsize=70, ha="center", va="center", rotation=20, weight="bold", zorder=10)
 
