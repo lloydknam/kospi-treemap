@@ -14,16 +14,16 @@
 *{box-sizing:border-box}
 html{color-scheme:light}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:Pretendard,-apple-system,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;-webkit-text-size-adjust:100%}
-.wrap{max-width:none;margin:0 auto;padding:6px}
+.wrap{max-width:1040px;margin:0 auto;padding:16px}
 .frame{padding:4px;border-radius:26px;background:linear-gradient(135deg,#3cd0b4 0%,#15977f 55%,#085c52 100%);box-shadow:0 6px 24px rgba(8,92,82,.12)}
-.card{background:#fff;border-radius:22px;padding:14px 14px 10px}
+.card{background:#fff;border-radius:22px;padding:22px 22px 14px}
 .head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
 .date{font-weight:800;font-size:clamp(26px,4.6vw,44px);letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
 .date small{display:block;font-size:.3em;font-weight:600;color:var(--soft);letter-spacing:0;margin-top:6px}
 .title{text-align:right}
 .title h1{margin:0;font-size:clamp(16px,2.6vw,22px);font-weight:700}
 .title p{margin:4px 0 0;color:var(--soft);font-size:clamp(12px,1.8vw,14px)}
-.stage{position:relative;margin-top:10px;width:100%;height:clamp(360px,60vh,780px);touch-action:pan-y}
+.stage{position:relative;margin-top:14px;width:100%;aspect-ratio:100/64;touch-action:pan-y}
 canvas{display:block;width:100%;height:100%}
 #tm{border-radius:10px;background:#fff}
 .tip{position:absolute;pointer-events:none;z-index:5;background:rgba(255,255,255,.97);border:1px solid var(--line);border-radius:10px;box-shadow:0 6px 18px rgba(30,40,60,.14);padding:9px 12px;font-size:13px;line-height:1.5;min-width:150px;display:none}
@@ -34,7 +34,7 @@ canvas{display:block;width:100%;height:100%}
 .readout .k{font-size:12px;color:var(--soft);font-weight:600}
 .readout .v{font-size:clamp(30px,6.2vw,56px);font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
 .readout .v.cap{color:var(--teal-d)}
-.chart{position:relative;width:100%;height:clamp(110px,17vh,190px);margin-top:2px}
+.chart{position:relative;width:100%;aspect-ratio:100/17;margin-top:2px}
 .controls{display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap}
 button,select{font:inherit;color:var(--ink)}
 .play{width:42px;height:42px;border-radius:50%;border:0;background:linear-gradient(135deg,#3cd0b4,#15977f);color:#fff;font-size:16px;cursor:pointer;flex:none;display:grid;place-items:center}
@@ -55,10 +55,11 @@ select{border:1px solid var(--line);border-radius:999px;padding:7px 10px;backgro
 .hitsrow{text-align:center}.hits{display:inline-block;line-height:0}.hits img{height:20px;width:auto}
 .note{max-width:1040px;margin:12px auto 0;padding:0 8px;font-size:12px;color:var(--soft);line-height:1.6}
 @media (max-width:620px){
-  .card{padding:12px 8px 8px}
-  .wrap{padding:4px}
-  .stage{height:auto;aspect-ratio:100/92}
-  .chart{height:auto;aspect-ratio:100/26}
+  .wrap{padding:3px}
+  .frame{padding:3px;border-radius:22px}
+  .card{padding:10px 7px 8px;border-radius:19px}
+  .stage{aspect-ratio:100/92}
+  .chart{aspect-ratio:100/26}
   .legend{display:none}
   .title{text-align:left}
 }
