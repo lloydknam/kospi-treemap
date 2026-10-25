@@ -3,7 +3,7 @@
 --top 0 : 전종목(기본). 숫자면 마지막 시점 시총 상위 N개만.
 --abs   : 면적=시총 절대값 (전체 크기가 시총에 따라 변함, 점선=기간 중 최대)
 """
-import argparse, subprocess
+import argparse, subprocess, os
 import numpy as np, pandas as pd, squarify
 import matplotlib
 matplotlib.use("Agg")
@@ -23,6 +23,8 @@ ap.add_argument("--sub", type=int, default=2, help="구간당 보간 프레임 (
 ap.add_argument("--fps", type=int, default=24)
 ap.add_argument("--abs", action="store_true")
 ap.add_argument("--credit", default="Lloyd's balcony lab\nwith claude · GitHub(@lloydknam)")
+ap.add_argument("--credit-logo", default=os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "brand", "lockup-light.png"),
+                help="크레딧 로고 PNG(있으면 글자 대신 로고를 넣음)")
 ap.add_argument("--note", default="")
 a = ap.parse_args()
 
@@ -117,7 +119,13 @@ sub1 = fig.text(0.965, 0.918, "", color=SOFT, fontsize=10.5, ha="right", va="cen
 sub2 = fig.text(0.965, 0.888, "", color=SOFT, fontsize=10.5, ha="right", va="center")
 fig.text(0.965, 0.024, "출처: 네이버 증권(종목·시가총액), Yahoo Finance(종가·KOSPI 지수) · 시총은 종가×주식수 근사치",
          color="#a3a8bd", fontsize=8.5, ha="right", va="bottom")
-if a.credit:
+if a.credit_logo and os.path.exists(a.credit_logo):
+    from PIL import Image as _Im
+    _lg = _Im.open(a.credit_logo).convert("RGBA")
+    _h = int(PX * 0.042)                                   # 크레딧 로고 높이(px)
+    _lg = _lg.resize((int(_lg.width * _h / _lg.height), _h), _Im.LANCZOS)
+    fig.figimage(np.asarray(_lg).astype(float) / 255, int(PX * 0.035), int(PX * 0.024), zorder=5)
+elif a.credit:
     fig.text(0.035, 0.024, a.credit, color="#4f8f84", fontsize=8.8, ha="left", va="bottom", fontweight="medium", linespacing=1.3)
 if a.note:
     fig.text(0.5, 0.55, a.note, color=INK, alpha=0.12, fontsize=70, ha="center", va="center", rotation=20, weight="bold", zorder=10)
