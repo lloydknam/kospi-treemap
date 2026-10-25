@@ -111,7 +111,7 @@ fig = plt.figure(figsize=(PX / 100, PX / 100), dpi=100, facecolor=BG)
 fig.figimage(make_bg(), 0, 0, zorder=-10)
 ax = fig.add_axes(TM)
 cx = fig.add_axes([0.095, 0.095, 0.83, 0.15], facecolor="none")
-date_t = fig.text(0.05, 0.925, "", color=HEAD, fontsize=42, weight="bold", va="center")
+date_t = fig.text(0.05, 0.925, "", color=HEAD, fontsize=30, weight="bold", va="center")
 head_t = fig.text(0.95, 0.955, "KOSPI 시가총액 지도", color=HEAD, fontsize=17, weight="semibold", ha="right", va="center")
 sub1 = fig.text(0.95, 0.918, "", color=SOFT, fontsize=10.5, ha="right", va="center")
 sub2 = fig.text(0.95, 0.888, "", color=SOFT, fontsize=10.5, ha="right", va="center")
@@ -127,7 +127,7 @@ pad = (ymax - ymin) * 0.12
 
 def chart(f, i, j, tot):
     cx.clear(); cx.set_facecolor("none")
-    cx.set_xlim(xn[0], xn[-1]); cx.set_ylim(ymin - pad, ymax + pad * 2.6)
+    cx.set_xlim(xn[0], xn[-1]); cx.set_ylim(ymin - pad, ymax + pad * 4.2)
     cx.plot(xn, ixv, color="#d5d8e6", lw=2.2, solid_capstyle="round")
     k = i + 1
     px = list(xn[:k]) + [xn[i] * (1 - f) + xn[j] * f]
@@ -136,9 +136,9 @@ def chart(f, i, j, tot):
     cx.plot(px, py, color="#17a58b", lw=2.6, solid_capstyle="round")
     cx.plot([px[-1]], [py[-1]], "o", ms=9, color="white", mec="#0f8a74", mew=2.6, zorder=5)
     cx.text(0.005, 0.97, "KOSPI 지수", transform=cx.transAxes, color=SOFT, fontsize=14, va="top")
-    cx.text(0.175, 0.99, f"{py[-1]:,.0f}", transform=cx.transAxes, color=HEAD, fontsize=23, weight="bold", va="top")
-    cx.text(0.345, 0.97, "시총", transform=cx.transAxes, color=SOFT, fontsize=14, va="top")
-    cx.text(0.405, 0.99, f"{tot:,.0f}조원", transform=cx.transAxes, color="#0f8a74", fontsize=23, weight="bold", va="top")
+    cx.text(0.185, 1.0, f"{py[-1]:,.0f}", transform=cx.transAxes, color=HEAD, fontsize=32, weight="bold", va="top")
+    cx.text(0.43, 0.96, "시총", transform=cx.transAxes, color=SOFT, fontsize=15, va="top")
+    cx.text(0.495, 1.0, f"{tot:,.0f}조원", transform=cx.transAxes, color="#0f8a74", fontsize=32, weight="bold", va="top")
     cx.xaxis.set_major_locator(mdates.MonthLocator(bymonth=(1, 4, 7, 10)))
     cx.xaxis.set_major_formatter(mdates.DateFormatter("%Y.%m"))
     cx.xaxis.set_minor_locator(mdates.MonthLocator())
