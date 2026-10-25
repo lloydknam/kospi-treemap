@@ -22,7 +22,7 @@ ap.add_argument("--start", default="2025-01-01")
 ap.add_argument("--sub", type=int, default=2, help="구간당 보간 프레임 (작을수록 빠름)")
 ap.add_argument("--fps", type=int, default=24)
 ap.add_argument("--abs", action="store_true")
-ap.add_argument("--credit", default="@lloydknam · with Claude")
+ap.add_argument("--credit", default="Lloyd’s Balcony Lab · with Claude\nGitHub(@lloydknam)")
 ap.add_argument("--note", default="")
 a = ap.parse_args()
 
@@ -50,7 +50,7 @@ names = df.drop_duplicates("ticker").set_index("ticker")["name"].to_dict()
 unit = "주간" if a.freq == "weekly" else "전일대비"
 lim = 8.0 if a.freq == "weekly" else 3.0
 
-ix = pd.read_csv(a.index, parse_dates=["date"]).set_index("date")["close"].sort_index()
+ix = pd.read_csv(a.index, parse_dates=["date"]).set_index("date")["close"].sort_index().dropna()
 ixv = ix.reindex(pd.DatetimeIndex(dates), method="ffill").values
 xn = mdates.date2num(pd.DatetimeIndex(dates).to_pydatetime())
 
@@ -118,7 +118,7 @@ sub2 = fig.text(0.95, 0.888, "", color=SOFT, fontsize=10.5, ha="right", va="cent
 fig.text(0.95, 0.024, "출처: 네이버 증권(종목·시가총액), Yahoo Finance(종가·KOSPI 지수) · 시총은 종가×주식수 근사치",
          color="#a3a8bd", fontsize=8.5, ha="right", va="bottom")
 if a.credit:
-    fig.text(0.05, 0.024, a.credit, color="#4f8f84", fontsize=9.5, ha="left", va="bottom", fontweight="medium")
+    fig.text(0.05, 0.024, a.credit, color="#4f8f84", fontsize=8.8, ha="left", va="bottom", fontweight="medium", linespacing=1.3)
 if a.note:
     fig.text(0.5, 0.55, a.note, color=INK, alpha=0.12, fontsize=70, ha="center", va="center", rotation=20, weight="bold", zorder=10)
 
