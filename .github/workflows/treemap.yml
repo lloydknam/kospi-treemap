@@ -110,7 +110,22 @@ jobs:
           git add logs; git diff --cached --quiet || git commit -qm "logs"; git pull --rebase -q || true; git push || true
       - name: Release
         env: { GH_TOKEN: "${{ github.token }}" }
+        shell: bash
         run: |
-          gh release view latest >/dev/null 2>&1 || gh release create latest -t "KOSPI treemap (latest)" -n "자동 갱신"
-          gh release edit latest -n "자동 갱신 · updated $(python -c "import pandas as pd;print(pd.read_csv('data/kospi_mcap.csv',usecols=['date']).date.max())")"
-          gh release upload latest kospi.mp4 kospi_abs.mp4 data/kospi_mcap.csv --clobber
+          set +e
+          mkdir -p logs
+          D=$(python -c "import pandas as pd;print(pd.read_csv('data/kospi_mcap.csv',usecols=['date']).date.max())")
+          echo "date=$D" > logs/release.log
+          gh release view latest >/dev/null 2>&1 || gh release create latest -t "KOSPI treemap (latest)" -n "자동 갱신" >> logs/release.log 2>&1
+          echo "create/view exit $?" >> logs/release.log
+          ls -la kospi.mp4 kospi_abs.mp4 data/kospi_mcap.csv >> logs/release.log 2>&1
+          gh release upload latest kospi.mp4 kospi_abs.mp4 data/kospi_mcap.csv --clobber >> logs/release.log 2>&1
+          U=$?; echo "upload exit $U" >> logs/release.log
+          gh release edit latest -n "자동 갱신 · updated $D" >> logs/release.log 2>&1
+          echo "edit exit $?" >> logs/release.log
+          exit $U
+      - name: Save release log
+        if: always()
+        run: |
+          git config user.name github-actions; git config user.email actions@github.com
+          git add logs; git diff --cached --quiet || git commit -qm "release log"; git pull --rebase -q || true; git push || true
