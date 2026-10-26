@@ -1,50 +1,62 @@
 naver stocks 942
-batch 0 got 80
-batch 80 got 160
-batch 160 got 240
-batch 240 got 320
-batch 320 got 400
-batch 400 got 480
-batch 480 got 560
-batch 560 got 640
-batch 640 got 720
-batch 720 got 800
-batch 800 got 880
-batch 880 got 942
-tickers with prices 942 of 942
-share-ratio tickers 116
-dropped 32
+
+1 Failed download:
+['035720.KS']: OperationalError('database is locked')
+batch 0 got 79
+batch 80 got 159
+batch 160 got 239
+batch 240 got 319
+batch 320 got 399
+batch 400 got 479
+batch 480 got 559
+batch 560 got 639
+batch 640 got 719
+batch 720 got 799
+batch 800 got 879
+batch 880 got 941
+tickers with prices 941 of 942
+share-ratio tickers 115
+dropped 41
   drop ('007070', 'GS리테일', 'jump', np.float64(0.34))
+  drop ('322000', 'HD현대에너지솔루션', 'px mismatch', np.float64(1.09))
   drop ('005180', '빙그레', 'jump', np.float64(0.54))
-  drop ('094800', '맵스리얼티', 'jump', np.float64(0.45))
+  drop ('094800', '맵스리얼티', 'jump', np.float64(0.47))
   drop ('003620', 'KG모빌리티', 'jump', np.float64(0.8))
   drop ('161000', '애경케미칼', 'jump', np.float64(0.59))
-  drop ('004710', '한솔테크닉스', 'px mismatch', np.float64(1.05))
   drop ('000070', '삼양홀딩스', 'jump', np.float64(0.46))
+  drop ('097520', '엠씨넥스', 'px mismatch', np.float64(0.95))
+  drop ('244920', '에이플러스에셋', 'px mismatch', np.float64(0.94))
   drop ('009160', 'SIMPAC', 'jump', np.float64(0.52))
   drop ('001470', '삼부토건', 'px mismatch', np.float64(1.62))
   drop ('000300', 'DH오토넥스', 'px mismatch', np.float64(5020.53))
   drop ('298000', '효성화학', 'jump', np.float64(0.41))
+  drop ('003830', '대한화섬', 'px mismatch', np.float64(0.93))
+  drop ('001080', 'MH머트리얼즈', 'px mismatch', np.float64(0.94))
+  drop ('005800', '신영와코루', 'px mismatch', np.float64(0.89))
   drop ('002210', '동성제약', 'jump', np.float64(0.85))
   drop ('011810', 'STX', 'px mismatch', np.float64(116.28))
   drop ('119650', 'KC코트렐', 'px mismatch', np.float64(1.72))
   drop ('417310', '코람코더원리츠', 'jump', np.float64(0.79))
-  drop ('006840', 'AK홀딩스', 'px mismatch', np.float64(0.92))
+  drop ('37550L', 'DL이앤씨2우(전환)', 'px mismatch', np.float64(0.95))
   drop ('214330', '금호에이치티', 'jump', np.float64(0.77))
   drop ('109070', '주성코퍼레이션', 'jump', np.float64(0.38))
+  drop ('005750', '대림바스', 'px mismatch', np.float64(1.05))
+  drop ('007280', '한국특강', 'px mismatch', np.float64(0.94))
   drop ('007610', '선도전기', 'jump', np.float64(1.18))
   drop ('019680', '대교', 'jump', np.float64(1.23))
-  drop ('210980', 'SK디앤디', 'jump', np.float64(0.33))
+  drop ('006980', '우성', 'px mismatch', np.float64(1.05))
   drop ('069460', '대호에이엘', 'jump', np.float64(4.0))
-  drop ('396690', '미래에셋글로벌리츠', 'px mismatch', np.float64(1.06))
+  drop ('210980', 'SK디앤디', 'jump', np.float64(0.33))
   drop ('074610', '이엔플러스', 'jump', np.float64(9.0))
   drop ('017040', '광명전기', 'px mismatch', np.float64(5.0))
   drop ('009310', '참엔지니어링', 'jump', np.float64(4.0))
+  drop ('071950', '코아스', 'px mismatch', np.float64(0.93))
   drop ('015020', '이스타코', 'jump', np.float64(1.0))
-  drop ('006490', '프리티', 'jump', np.float64(0.89))
   drop ('008600', '윌비스', 'jump', np.float64(8.74))
+  drop ('006490', '프리티', 'jump', np.float64(0.89))
   drop ('019685', '대교우B', 'jump', np.float64(1.08))
   drop ('145210', '다이나믹디자인', 'jump', np.float64(9.0))
+  drop ('011155', 'CJ씨푸드1우', 'jump', np.float64(0.53))
   drop ('004415', '서울식품우', 'jump', np.float64(0.45))
-saved 400121 rows 445 days 910 tickers
-index rows 445
+saved 396566 rows 446 days 900 tickers
+index rows 446
