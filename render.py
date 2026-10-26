@@ -22,7 +22,7 @@ ap.add_argument("--start", default="2025-01-01")
 ap.add_argument("--sub", type=int, default=2, help="구간당 보간 프레임 (작을수록 빠름)")
 ap.add_argument("--fps", type=int, default=24)
 ap.add_argument("--abs", action="store_true")
-ap.add_argument("--credit", default="Lloyd's balcony lab\nwith claude · GitHub(@lloydknam)")
+ap.add_argument("--credit", default="Lloyd's Balcony Lab\nwith claude · GitHub(@lloydknam)")
 ap.add_argument("--credit-logo", default=os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "brand", "lockup-light.png"),
                 help="크레딧 로고 PNG(있으면 글자 대신 로고를 넣음)")
 ap.add_argument("--note", default="")
