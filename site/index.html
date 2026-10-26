@@ -76,12 +76,13 @@ select{border:1px solid var(--line);border-radius:999px;padding:7px 10px;backgro
   .title{text-align:right;max-width:50%}
   .title h1{font-size:14px}
   .title p{font-size:10.5px;line-height:1.35;margin-top:2px}
-  .stage{margin-top:8px;aspect-ratio:100/92;max-height:max(200px,calc(100svh - 395px))}
+  .stage{margin-top:6px;aspect-ratio:100/108;max-height:max(240px,calc(100svh - 318px))}
   .readout{margin-top:8px}
-  .readout .v{font-size:clamp(24px,7.4vw,34px)}
+  .readout .v{font-size:clamp(24px,7vw,32px)}
   .readout .k{font-size:11px}
-  .chart{aspect-ratio:100/26;max-height:86px}
-  .controls{gap:8px;margin-top:6px}
+  .chart{aspect-ratio:100/26;max-height:72px}
+  .foot{display:none}
+  .controls{gap:8px;margin-top:4px}
   .play{width:38px;height:38px}
   input[type=range]{min-width:100px}
   .legend{display:none}
@@ -373,7 +374,7 @@ fetch("data.json?v=" + Date.now()).then(r => r.json()).then(async d => {
   if (h.get("d")){ const k = d.dates.indexOf(h.get("d")); if (k >= 0) pos = k; }
   if (h.get("m") === "share") document.querySelector('#mode button[data-m="share"]').click();
   $("src").textContent = `출처: 네이버 증권·Yahoo Finance · 종가×주식수 근사치 · 데이터 기준 ${d.updated}`;
-  $("note").textContent = `${d.dates[0]} ~ ${d.updated} · ${d.tickers.length.toLocaleString()}개 종목(우선주 포함). 매 평일 장 마감 후 자동 갱신됩니다. 시가총액은 종가에 현재 주식수(상위 종목은 증자·소각 반영)를 곱한 근사치라 KRX 공식 수치와 다를 수 있습니다. 단축키: 스페이스 재생, ←/→ 하루 이동(Shift는 10일).`;
+  $("note").textContent = `출처: 네이버 증권·Yahoo Finance. ${d.dates[0]} ~ ${d.updated} · ${d.tickers.length.toLocaleString()}개 종목(우선주 포함). 매 평일 장 마감 후 자동 갱신됩니다. 시가총액은 종가에 현재 주식수(상위 종목은 증자·소각 반영)를 곱한 근사치라 KRX 공식 수치와 다를 수 있습니다. 단축키: 스페이스 재생, ←/→ 하루 이동(Shift는 10일).`;
   try { await document.fonts.load("700 14px Pretendard"); await document.fonts.load("500 14px Pretendard"); } catch (_) {}
   resize();
 }).catch(e => { $("date").firstChild.nodeValue = "데이터를 불러오지 못했어요"; console.error(e); });
