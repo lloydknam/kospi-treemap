@@ -3,6 +3,8 @@ on:
   workflow_dispatch:
   schedule:
     - cron: "30 9 * * 1-5"   # 평일 18:30 KST (장 마감·데이터 반영 후)
+    - cron: "50 10 * * 1-5"  # 백업 19:50 KST (예약 지연·누락 대비, 새 거래일 없으면 자동 건너뜀)
+    - cron: "20 12 * * 1-5"  # 백업 21:20 KST
 
 permissions:
   contents: write
