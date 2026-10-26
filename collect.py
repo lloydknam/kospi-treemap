@@ -71,12 +71,15 @@ print("share-ratio tickers", len(ratio))
 
 # ---- 4) 합치기
 rows, bad = [], []
+ALL = sorted(set().union(*[set(pd.DatetimeIndex(v.index).tz_localize(None).normalize()) for v in closes.values()]))
 for c, cl in closes.items():
     cl.index = pd.DatetimeIndex(cl.index).tz_localize(None).normalize()
     cl = cl[~cl.index.duplicated(keep="last")]
+    # 야후가 일부 종목의 최신 일봉을 늦게 주는 경우/거래정지일은 직전 종가로 최대 3일 채움 (등락률 0)
+    cl = cl.reindex([d for d in ALL if d >= cl.index[0]]).ffill(limit=3).dropna()
     sh = meta[c]["shares"]
     # 검증 1) 야후 최신 종가가 네이버 현재가와 크게 다르면(다른 종목/오류) 제외
-    if abs(cl.iloc[-1] / meta[c]["px"] - 1) > 0.05:
+    if abs(cl.iloc[-1] / meta[c]["px"] - 1) > 0.32:   # 가격제한폭(30%) 초과 불일치만 제외 (최신 일봉 지연은 허용)
         bad.append((c, meta[c]["name"], "px mismatch", round(cl.iloc[-1] / meta[c]["px"], 2))); continue
     # 검증 2) 일일 변동 31% 초과(가격제한폭 초과)는 액면분할/감자 미조정 가능성 -> 제외
     if (cl.pct_change().abs() > 0.315).any():
