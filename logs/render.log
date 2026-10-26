@@ -1,7 +1,7 @@
 P1 exit 0
 P2 exit 0
--rw-r--r-- 1 runner runner 19201716 Oct 24 08:36 kospi.mp4
--rw-r--r-- 1 runner runner 10820309 Oct 24 08:35 kospi_abs.mp4
+-rw-r--r-- 1 runner runner 19286514 Oct 26 12:02 kospi.mp4
+-rw-r--r-- 1 runner runner 10918881 Oct 26 12:02 kospi_abs.mp4
 tail: option used in invalid context -- 3
-done kospi.mp4 439 points 910 tickers
-done kospi_abs.mp4 439 points 910 tickers
+done kospi.mp4 440 points 912 tickers
+done kospi_abs.mp4 440 points 912 tickers
