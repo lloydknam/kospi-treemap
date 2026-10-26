@@ -1,26 +1,23 @@
 naver stocks 942
-
-1 Failed download:
-['035720.KS']: OperationalError('database is locked')
-batch 0 got 79
-batch 80 got 159
-batch 160 got 239
-batch 240 got 319
-batch 320 got 399
-batch 400 got 479
-batch 480 got 559
-batch 560 got 639
-batch 640 got 719
-batch 720 got 799
-batch 800 got 879
-batch 880 got 941
-tickers with prices 941 of 942
-share-ratio tickers 115
+batch 0 got 80
+batch 80 got 160
+batch 160 got 240
+batch 240 got 320
+batch 320 got 400
+batch 400 got 480
+batch 480 got 560
+batch 560 got 640
+batch 640 got 720
+batch 720 got 800
+batch 800 got 880
+batch 880 got 942
+tickers with prices 942 of 942
+share-ratio tickers 116
 dropped 41
   drop ('007070', 'GS리테일', 'jump', np.float64(0.34))
   drop ('322000', 'HD현대에너지솔루션', 'px mismatch', np.float64(1.09))
   drop ('005180', '빙그레', 'jump', np.float64(0.54))
-  drop ('094800', '맵스리얼티', 'jump', np.float64(0.47))
+  drop ('094800', '맵스리얼티', 'jump', np.float64(0.45))
   drop ('003620', 'KG모빌리티', 'jump', np.float64(0.8))
   drop ('161000', '애경케미칼', 'jump', np.float64(0.59))
   drop ('000070', '삼양홀딩스', 'jump', np.float64(0.46))
@@ -58,5 +55,5 @@ dropped 41
   drop ('145210', '다이나믹디자인', 'jump', np.float64(9.0))
   drop ('011155', 'CJ씨푸드1우', 'jump', np.float64(0.53))
   drop ('004415', '서울식품우', 'jump', np.float64(0.45))
-saved 396566 rows 446 days 900 tickers
+saved 397011 rows 446 days 901 tickers
 index rows 446
