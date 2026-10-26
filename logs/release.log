@@ -1,8 +1,8 @@
 date=2026-10-26
 create/view exit 0
--rw-r--r-- 1 runner runner 23935551 Oct 26 11:58 data/kospi_mcap.csv
--rw-r--r-- 1 runner runner 19286514 Oct 26 12:02 kospi.mp4
--rw-r--r-- 1 runner runner 10918881 Oct 26 12:02 kospi_abs.mp4
+-rw-r--r-- 1 runner runner 23933125 Oct 26 16:35 data/kospi_mcap.csv
+-rw-r--r-- 1 runner runner 19270582 Oct 26 16:41 kospi.mp4
+-rw-r--r-- 1 runner runner 10884911 Oct 26 16:40 kospi_abs.mp4
 upload exit 0
 https://github.com/lloydknam/kospi-treemap/releases/tag/latest
 edit exit 0
