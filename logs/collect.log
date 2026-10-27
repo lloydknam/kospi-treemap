@@ -45,4 +45,4 @@ dropped 30
   drop ('011155', 'CJ씨푸드1우', 'jump', np.float64(0.53))
   drop ('004415', '서울식품우', 'px mismatch', np.float64(1.54))
 saved 403808 rows 447 days 912 tickers
-index rows 447
+index rows 446
