@@ -22,8 +22,9 @@ dropped 30
   drop ('000070', '삼양홀딩스', 'jump', np.float64(0.46))
   drop ('009160', 'SIMPAC', 'jump', np.float64(0.52))
   drop ('001470', '삼부토건', 'px mismatch', np.float64(1.62))
-  drop ('298000', '효성화학', 'jump', np.float64(0.41))
   drop ('000300', 'DH오토넥스', 'px mismatch', np.float64(5020.53))
+  drop ('298000', '효성화학', 'jump', np.float64(0.41))
+  drop ('210980', 'SK디앤디', 'jump', np.float64(0.33))
   drop ('002210', '동성제약', 'jump', np.float64(0.85))
   drop ('011810', 'STX', 'px mismatch', np.float64(116.28))
   drop ('119650', 'KC코트렐', 'px mismatch', np.float64(1.72))
@@ -33,7 +34,6 @@ dropped 30
   drop ('007610', '선도전기', 'jump', np.float64(1.18))
   drop ('019680', '대교', 'jump', np.float64(1.0))
   drop ('069460', '대호에이엘', 'jump', np.float64(4.0))
-  drop ('210980', 'SK디앤디', 'jump', np.float64(0.33))
   drop ('074610', '이엔플러스', 'jump', np.float64(9.0))
   drop ('017040', '광명전기', 'px mismatch', np.float64(5.0))
   drop ('009310', '참엔지니어링', 'jump', np.float64(4.0))
@@ -43,6 +43,6 @@ dropped 30
   drop ('019685', '대교우B', 'jump', np.float64(1.0))
   drop ('145210', '다이나믹디자인', 'jump', np.float64(9.0))
   drop ('011155', 'CJ씨푸드1우', 'jump', np.float64(0.53))
-  drop ('004415', '서울식품우', 'px mismatch', np.float64(1.54))
-saved 403808 rows 447 days 912 tickers
-index rows 446
+  drop ('004415', '서울식품우', 'px mismatch', np.float64(2.5))
+saved 404720 rows 448 days 912 tickers
+index rows 448
