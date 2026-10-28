@@ -31,6 +31,7 @@ canvas{display:block;width:100%;height:100%}
 .tip .r{display:flex;justify-content:space-between;gap:16px;color:var(--soft)}
 .tip .r span:last-child{color:var(--ink);font-variant-numeric:tabular-nums;font-weight:600}
 .readout{display:flex;justify-content:space-between;align-items:flex-end;margin-top:14px;gap:12px;flex-wrap:wrap}
+.readout .chg{font-size:.36em;font-weight:700;letter-spacing:0;margin-left:.15em;vertical-align:baseline}
 .readout .k{font-size:12px;color:var(--soft);font-weight:600}
 .readout .v{font-size:clamp(30px,6.2vw,56px);font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
 .readout .v.cap{color:var(--teal-d)}
@@ -106,7 +107,7 @@ select{border:1px solid var(--line);border-radius:999px;padding:7px 10px;backgro
   </div>
 
   <div class="readout">
-    <div><div class="k">KOSPI 지수</div><div class="v" id="ixv">—</div></div>
+    <div><div class="k">KOSPI 지수</div><div class="v"><span id="ixv">—</span><span class="chg" id="ixc"></span></div></div>
     <div style="text-align:right"><div class="k">전체 시가총액</div><div class="v cap" id="capv">—</div></div>
   </div>
   <div class="chart"><canvas id="ix" aria-label="코스피 지수 추이"></canvas></div>
@@ -273,6 +274,12 @@ function draw(){
   $("dow").textContent = DOW[dt.getDay()] + "요일";
   $("capv").textContent = Math.round(tot / 1e4).toLocaleString("ko-KR") + "조원";
   $("ixv").textContent = lerp(D.index[i], D.index[j], f).toLocaleString("ko-KR", {maximumFractionDigits: 0});
+  const pv = D.index[di - 1], cv = D.index[di], ce = $("ixc");
+  if (di > 0 && pv > 0){
+    const r = (cv / pv - 1) * 100;
+    ce.textContent = " (" + (r > 0 ? "+" : "") + r.toFixed(2) + "%)";
+    ce.style.color = r > 0 ? "var(--up)" : r < 0 ? "var(--down)" : "";
+  } else ce.textContent = "";
   $("slider").value = di;
 }
 
