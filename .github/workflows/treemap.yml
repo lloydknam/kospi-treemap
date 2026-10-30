@@ -2,9 +2,12 @@ name: kospi-treemap
 on:
   workflow_dispatch:
   schedule:
-    - cron: "30 9 * * 1-5"   # 평일 18:30 KST (장 마감·데이터 반영 후)
-    - cron: "50 10 * * 1-5"  # 백업 19:50 KST (예약 지연·누락 대비, 새 거래일 없으면 자동 건너뜀)
-    - cron: "20 12 * * 1-5"  # 백업 21:20 KST
+    # 평일 오후 여러 번 시도 (GitHub 예약 지연 대비, 매시 정각 회피). 새 거래일·지수 값이 없으면 자동으로 건너뜀
+    - cron: "23 7 * * 1-5"    # 16:23 KST
+    - cron: "47 8 * * 1-5"    # 17:47 KST
+    - cron: "37 9 * * 1-5"    # 18:37 KST
+    - cron: "53 10 * * 1-5"   # 19:53 KST
+    - cron: "17 12 * * 1-5"   # 21:17 KST
 
 permissions:
   contents: write
@@ -37,9 +40,12 @@ jobs:
         shell: bash
         run: |
           NEW=$(python -c "import json;print(json.load(open('site/data.json'))['updated'])")
-          OLD=$(gh release view latest --json body --jq .body 2>/dev/null | grep -o 'updated [0-9-]*' | head -1 | cut -d' ' -f2 || true)
-          echo "new=$NEW old=$OLD"
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "$NEW" != "$OLD" ]; then echo "changed=true" >> $GITHUB_OUTPUT; else echo "changed=false" >> $GITHUB_OUTPUT; fi
+          IX=$(python -c "import pandas as pd;print(pd.read_csv('data/kospi_index.csv').dropna().date.max())")
+          BODY=$(gh release view latest --json body --jq .body 2>/dev/null || true)
+          OLD=$(echo "$BODY" | grep -o 'updated [0-9-]*' | head -1 | cut -d' ' -f2 || true)
+          OLDIX=$(echo "$BODY" | grep -o 'ix [0-9-]*' | head -1 | cut -d' ' -f2 || true)
+          echo "new=$NEW old=$OLD ix=$IX oldix=$OLDIX"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "$NEW" != "$OLD" ] || [ "$IX" != "$OLDIX" ]; then echo "changed=true" >> $GITHUB_OUTPUT; else echo "changed=false" >> $GITHUB_OUTPUT; fi
           echo "$NEW" > site/.updated
       - uses: actions/upload-pages-artifact@v3
         if: steps.chk.outputs.changed == 'true'
@@ -121,7 +127,8 @@ jobs:
           ls -la kospi.mp4 kospi_abs.mp4 data/kospi_mcap.csv >> logs/release.log 2>&1
           gh release upload latest kospi.mp4 kospi_abs.mp4 data/kospi_mcap.csv --clobber >> logs/release.log 2>&1
           U=$?; echo "upload exit $U" >> logs/release.log
-          gh release edit latest -n "자동 갱신 · updated $D" >> logs/release.log 2>&1
+          IX=$(python -c "import pandas as pd;print(pd.read_csv('data/kospi_index.csv').dropna().date.max())")
+          gh release edit latest -n "자동 갱신 · updated $D · ix $IX" >> logs/release.log 2>&1
           echo "edit exit $?" >> logs/release.log
           exit $U
       - name: Save release log
