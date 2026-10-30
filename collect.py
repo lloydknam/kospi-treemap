@@ -14,9 +14,11 @@ os.makedirs("data", exist_ok=True)
 
 # ---- 1) 네이버 전종목
 stocks = []
+MKT = None                                   # 네이버 장 상태 (CLOSE 일 때만 오늘 종가로 채움)
 for p in range(1, 40):
     j = requests.get(f"https://m.stock.naver.com/api/stocks/marketValue/KOSPI?page={p}&pageSize=100",
                      headers=H, timeout=30).json()
+    if p == 1: MKT = j.get("marketStatus")
     s = j.get("stocks", [])
     stocks += s
     if len(s) < 100: break
@@ -28,8 +30,15 @@ for x in stocks:
     except Exception:
         continue
     if mv > 0 and px > 0:
-        meta[x["itemCode"]] = {"name": x["stockName"], "shares": mv / px, "mv": mv, "px": px}
+        lt = str(x.get("localTradedAt") or "")[:10]
+        try: dt = pd.Timestamp(lt)
+        except Exception: dt = None
+        meta[x["itemCode"]] = {"name": x["stockName"], "shares": mv / px, "mv": mv, "px": px, "dt": dt}
 print("naver stocks", len(meta))
+_dts = pd.Series([m["dt"] for m in meta.values() if m["dt"] is not None])
+NT = _dts.mode().iloc[0] if len(_dts) else None            # 네이버 기준 최신 거래일
+NAVER_OK = (MKT == "CLOSE") and NT is not None
+print("naver marketStatus", MKT, "trade date", NT, "use", NAVER_OK)
 if len(meta) < 300: sys.exit("naver list failed")
 codes = sorted(meta, key=lambda c: -meta[c]["mv"])
 
@@ -72,9 +81,15 @@ print("share-ratio tickers", len(ratio))
 # ---- 4) 합치기
 rows, bad = [], []
 ALL = sorted(set().union(*[set(pd.DatetimeIndex(v.index).tz_localize(None).normalize()) for v in closes.values()]))
+if NAVER_OK and NT > ALL[-1] and NT <= pd.Timestamp.now(tz="Asia/Seoul").tz_localize(None).normalize():
+    ALL.append(NT)
+n_naver = 0
 for c, cl in closes.items():
     cl.index = pd.DatetimeIndex(cl.index).tz_localize(None).normalize()
     cl = cl[~cl.index.duplicated(keep="last")]
+    # 야후가 아직 오늘 일봉을 못 올렸으면 네이버 종가로 먼저 채움 (이후 실행에서 야후 값으로 자동 교체)
+    if NAVER_OK and ALL[-1] == NT and cl.index[-1] < NT and meta[c].get("dt") == NT:
+        cl.loc[NT] = meta[c]["px"]; cl = cl.sort_index(); n_naver += 1
     # 야후가 일부 종목의 최신 일봉을 늦게 주는 경우/거래정지일은 직전 종가로 최대 3일 채움 (등락률 0)
     cl = cl.reindex([d for d in ALL if d >= cl.index[0]]).ffill(limit=3).dropna()
     sh = meta[c]["shares"]
@@ -94,6 +109,7 @@ for c, cl in closes.items():
     d["ticker"], d["name"] = c, meta[c]["name"]
     d.index.name = "date"
     rows.append(d.reset_index())
+print("naver-filled tickers for", NT if n_naver else None, ":", n_naver)
 print("dropped", len(bad)); [print("  drop", b) for b in bad[:60]]
 out = pd.concat(rows, ignore_index=True).dropna(subset=["mcap"])
 out["mcap"] = out["mcap"].round(0).astype("int64"); out["close"] = out["close"].round(1); out["chg"] = out["chg"].round(3)
@@ -103,5 +119,16 @@ print("saved", len(out), "rows", out["date"].nunique(), "days", out["ticker"].nu
 # ---- 5) 코스피 지수
 ixh = yf.Ticker("^KS11").history(start=START)
 ixh.index = ixh.index.tz_localize(None).normalize(); ixh.index.name = "date"
+try:                                                                  # 야후 지수가 늦으면 네이버 지수로 오늘 값 채움
+    lastv = ixh["Close"].dropna().index.max()
+    if NAVER_OK and (pd.isna(lastv) or lastv < NT):
+        jj = requests.get("https://m.stock.naver.com/api/index/KOSPI/basic", headers=H, timeout=30).json()
+        print("naver index resp", str(jj)[:400])
+        d_ix = pd.Timestamp(str(jj.get("localTradedAt") or "")[:10])
+        if jj.get("marketStatus") == "CLOSE" and d_ix == NT:
+            ixh.loc[NT, "Close"] = float(str(jj["closePrice"]).replace(",", ""))
+            print("index filled from naver", NT, ixh.loc[NT, "Close"])
+except Exception as e:
+    print("naver index fill failed", repr(e)[:200])
 ixh[["Close"]].rename(columns={"Close": "close"}).reset_index().to_csv("data/kospi_index.csv", index=False)
 print("index rows", len(ixh))
