@@ -1,4 +1,5 @@
-naver stocks 942
+naver stocks 941
+naver marketStatus OPEN trade date 2026-10-30 00:00:00 use False
 batch 0 got 80
 batch 80 got 160
 batch 160 got 240
@@ -10,13 +11,14 @@ batch 560 got 640
 batch 640 got 720
 batch 720 got 800
 batch 800 got 880
-batch 880 got 942
-tickers with prices 942 of 942
+batch 880 got 941
+tickers with prices 941 of 941
 share-ratio tickers 116
-dropped 30
+naver-filled tickers for None : 0
+dropped 29
   drop ('007070', 'GS리테일', 'jump', np.float64(0.34))
   drop ('005180', '빙그레', 'jump', np.float64(0.54))
-  drop ('094800', '맵스리얼티', 'jump', np.float64(0.47))
+  drop ('094800', '맵스리얼티', 'px mismatch', np.float64(1.72))
   drop ('003620', 'KG모빌리티', 'jump', np.float64(0.8))
   drop ('161000', '애경케미칼', 'jump', np.float64(0.59))
   drop ('000070', '삼양홀딩스', 'jump', np.float64(0.46))
@@ -29,8 +31,8 @@ dropped 30
   drop ('011810', 'STX', 'px mismatch', np.float64(116.28))
   drop ('119650', 'KC코트렐', 'px mismatch', np.float64(1.72))
   drop ('417310', '코람코더원리츠', 'jump', np.float64(0.79))
-  drop ('214330', '금호에이치티', 'jump', np.float64(0.77))
   drop ('109070', '주성코퍼레이션', 'jump', np.float64(0.38))
+  drop ('214330', '금호에이치티', 'jump', np.float64(0.77))
   drop ('019680', '대교', 'jump', np.float64(1.0))
   drop ('007610', '선도전기', 'jump', np.float64(1.18))
   drop ('069460', '대호에이엘', 'jump', np.float64(4.0))
@@ -40,9 +42,8 @@ dropped 30
   drop ('015020', '이스타코', 'jump', np.float64(1.0))
   drop ('008600', '윌비스', 'jump', np.float64(8.74))
   drop ('006490', '프리티', 'jump', np.float64(0.48))
-  drop ('019685', '대교우B', 'jump', np.float64(1.0))
   drop ('145210', '다이나믹디자인', 'jump', np.float64(9.0))
+  drop ('019685', '대교우B', 'jump', np.float64(1.0))
   drop ('011155', 'CJ씨푸드1우', 'jump', np.float64(0.53))
-  drop ('004415', '서울식품우', 'px mismatch', np.float64(2.68))
-saved 405632 rows 449 days 912 tickers
-index rows 448
+saved 406544 rows 450 days 912 tickers
+index rows 450
