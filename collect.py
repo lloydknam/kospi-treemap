@@ -39,6 +39,10 @@ _dts = pd.Series([m["dt"] for m in meta.values() if m["dt"] is not None])
 NT = _dts.mode().iloc[0] if len(_dts) else None            # 네이버 기준 최신 거래일
 NAVER_OK = (MKT == "CLOSE") and NT is not None
 print("naver marketStatus", MKT, "trade date", NT, "use", NAVER_OK)
+for _x in stocks[:2]:                                             # 장중/시간외 구분 확인용 프로브 (로그)
+    print("probe", _x.get("itemCode"), _x.get("closePrice"), _x.get("localTradedAt"), _x.get("marketStatus"),
+          {k: (_x.get("overMarketPriceInfo") or {}).get(k) for k in ("tradingSessionType", "overMarketStatus", "overPrice", "localTradedAt")},
+          (_x.get("stockExchangeType") or {}).get("closePriceSendTime"))
 if len(meta) < 300: sys.exit("naver list failed")
 codes = sorted(meta, key=lambda c: -meta[c]["mv"])
 
