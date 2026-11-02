@@ -1,8 +1,13 @@
 name: kospi-treemap
 on:
   workflow_dispatch:
+    inputs:
+      force:
+        description: "새 거래일이 없어도 배포·영상 생성"
+        type: boolean
+        default: true
   schedule:
-    # 평일 오후 여러 번 시도 (GitHub 예약 지연 대비, 매시 정각 회피). 새 거래일·지수 값이 없으면 자동으로 건너뜀
+    # 백업용. 평소에는 Cloudflare Worker(worker/)가 정시에 실행하고, GitHub 예약은 수 시간 늦게 돌아 자동으로 건너뜀
     - cron: "23 7 * * 1-5"    # 16:23 KST
     - cron: "47 8 * * 1-5"    # 17:47 KST
     - cron: "37 9 * * 1-5"    # 18:37 KST
@@ -45,7 +50,7 @@ jobs:
           OLD=$(echo "$BODY" | grep -o 'updated [0-9-]*' | head -1 | cut -d' ' -f2 || true)
           OLDIX=$(echo "$BODY" | grep -o 'ix [0-9-]*' | head -1 | cut -d' ' -f2 || true)
           echo "new=$NEW old=$OLD ix=$IX oldix=$OLDIX"
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "$NEW" != "$OLD" ] || [ "$IX" != "$OLDIX" ]; then echo "changed=true" >> $GITHUB_OUTPUT; else echo "changed=false" >> $GITHUB_OUTPUT; fi
+          if { [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ github.event.inputs.force }}" != "false" ]; } || [ "$NEW" != "$OLD" ] || [ "$IX" != "$OLDIX" ]; then echo "changed=true" >> $GITHUB_OUTPUT; else echo "changed=false" >> $GITHUB_OUTPUT; fi
           echo "$NEW" > site/.updated
       - uses: actions/upload-pages-artifact@v3
         if: steps.chk.outputs.changed == 'true'
