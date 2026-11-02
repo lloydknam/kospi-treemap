@@ -1,0 +1,12 @@
+name = "kospi-trigger"
+main = "worker.js"
+compatibility_date = "2026-10-01"
+
+[triggers]
+# Cloudflare Cron은 UTC 기준
+crons = [
+  "40 7 * * mon-fri",  # 16:40 KST 정규장 마감 후 1차
+  "35 11 * * mon-fri", # 20:35 KST 넥스트레이드 종료 후 2차 (네이버 종가·지수 확정)
+]
+
+# GH_TOKEN은 파일에 적지 말고 비밀 변수로 등록하세요: npx wrangler secret put GH_TOKEN
