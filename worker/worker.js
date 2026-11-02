@@ -4,9 +4,9 @@
 const REPO = "lloydknam/kospi-treemap";
 const WORKFLOW = "treemap.yml";
 
-async function dispatch(env, fetchImpl = fetch) {
+async function dispatch(env) {
   if (!env.GH_TOKEN) throw new Error("GH_TOKEN secret is not set");
-  const res = await fetchImpl(
+  const res = await fetch(
     `https://api.github.com/repos/${REPO}/actions/workflows/${WORKFLOW}/dispatches`,
     {
       method: "POST",
@@ -34,5 +34,3 @@ export default {
     return new Response("kospi-trigger: cron only\n");
   },
 };
-
-export { dispatch };
