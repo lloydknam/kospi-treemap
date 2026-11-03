@@ -1,7 +1,7 @@
 naver stocks 941
-naver marketStatus CLOSE trade date 2026-11-02 00:00:00 use True
-probe 005930 230,000 2026-11-02T20:20:20+09:00 CLOSE {'tradingSessionType': 'AFTER_MARKET', 'overMarketStatus': 'CLOSE', 'overPrice': '230,000', 'localTradedAt': '2026-11-02T20:00:00+09:00'} 1630
-probe 000660 1,480,000 2026-11-02T20:20:21+09:00 CLOSE {'tradingSessionType': 'AFTER_MARKET', 'overMarketStatus': 'CLOSE', 'overPrice': '1,480,000', 'localTradedAt': '2026-11-02T20:00:00+09:00'} 1630
+naver marketStatus OPEN trade date 2026-11-03 00:00:00 use False
+probe 005930 219,500 2026-11-03T16:40:22+09:00 OPEN {'tradingSessionType': 'AFTER_MARKET', 'overMarketStatus': 'OPEN', 'overPrice': '220,000', 'localTradedAt': '2026-11-03T16:40:52.709+09:00'} 1630
+probe 000660 1,398,000 2026-11-03T16:40:22+09:00 OPEN {'tradingSessionType': 'AFTER_MARKET', 'overMarketStatus': 'OPEN', 'overPrice': '1,398,000', 'localTradedAt': '2026-11-03T16:40:52.709+09:00'} 1630
 batch 0 got 80
 batch 80 got 160
 batch 160 got 240
@@ -16,7 +16,7 @@ batch 800 got 880
 batch 880 got 941
 tickers with prices 941 of 941
 share-ratio tickers 116
-naver-filled tickers for 2026-11-02 00:00:00 : 1
+naver-filled tickers for None : 0
 dropped 29
   drop ('007070', 'GS리테일', 'jump', np.float64(0.34))
   drop ('005180', '빙그레', 'jump', np.float64(0.54))
@@ -29,8 +29,8 @@ dropped 29
   drop ('000300', 'DH오토넥스', 'px mismatch', np.float64(5020.53))
   drop ('298000', '효성화학', 'jump', np.float64(0.41))
   drop ('210980', 'SK디앤디', 'jump', np.float64(0.33))
-  drop ('002210', '동성제약', 'jump', np.float64(0.85))
   drop ('011810', 'STX', 'px mismatch', np.float64(116.28))
+  drop ('002210', '동성제약', 'jump', np.float64(0.85))
   drop ('119650', 'KC코트렐', 'px mismatch', np.float64(1.72))
   drop ('417310', '코람코더원리츠', 'jump', np.float64(0.79))
   drop ('109070', '주성코퍼레이션', 'jump', np.float64(0.38))
@@ -47,7 +47,5 @@ dropped 29
   drop ('019685', '대교우B', 'jump', np.float64(1.0))
   drop ('145210', '다이나믹디자인', 'jump', np.float64(9.0))
   drop ('011155', 'CJ씨푸드1우', 'jump', np.float64(0.53))
-saved 407456 rows 451 days 912 tickers
-naver index resp {'stockEndType': 'index', 'itemCode': 'KOSPI', 'reutersCode': 'KOSPI', 'symbolCode': 'KOSPI', 'stockName': '코스피', 'itemLogoUrl': 'https://ssl.pstatic.net/imgstock/fn/real/logo/index/IndexKOSPI.svg', 'itemLogoPngUrl': 'https://ssl.pstatic.net/imgstock/fn/real/logo/png/index/IndexKOSPI.png', 'closePrice': '5,859.08', 'compareToPreviousClosePrice': '128.34', 'compareToPreviousPrice': {'code': '2', 't
-index filled from naver 2026-11-02 00:00:00 5859.08
-index rows 451
+saved 408368 rows 452 days 912 tickers
+index rows 452
