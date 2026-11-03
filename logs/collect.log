@@ -16,7 +16,7 @@ batch 800 got 880
 batch 880 got 941
 tickers with prices 941 of 941
 share-ratio tickers 116
-naver-filled tickers for 2026-11-03 00:00:00 : 941
+naver-filled tickers for 2026-11-03 00:00:00 : 938
 dropped 29
   drop ('007070', 'GS리테일', 'jump', np.float64(0.34))
   drop ('005180', '빙그레', 'jump', np.float64(0.54))
