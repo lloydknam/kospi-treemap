@@ -16,7 +16,7 @@ batch 800 got 880
 batch 880 got 941
 tickers with prices 941 of 941
 share-ratio tickers 116
-naver-filled tickers for 2026-11-03 00:00:00 : 30
+naver-filled tickers for 2026-11-03 00:00:00 : 941
 dropped 29
   drop ('007070', 'GS리테일', 'jump', np.float64(0.34))
   drop ('005180', '빙그레', 'jump', np.float64(0.54))
@@ -48,4 +48,6 @@ dropped 29
   drop ('019685', '대교우B', 'jump', np.float64(1.0))
   drop ('011155', 'CJ씨푸드1우', 'jump', np.float64(0.53))
 saved 408368 rows 452 days 912 tickers
+naver index resp {'stockEndType': 'index', 'itemCode': 'KOSPI', 'reutersCode': 'KOSPI', 'symbolCode': 'KOSPI', 'stockName': '코스피', 'itemLogoUrl': 'https://ssl.pstatic.net/imgstock/fn/real/logo/index/IndexKOSPI.svg', 'itemLogoPngUrl': 'https://ssl.pstatic.net/imgstock/fn/real/logo/png/index/IndexKOSPI.png', 'closePrice': '5,648.79', 'compareToPreviousClosePrice': '-210.29', 'compareToPreviousPrice': {'code': '5', '
+index filled from naver 2026-11-03 00:00:00 5648.79
 index rows 452
