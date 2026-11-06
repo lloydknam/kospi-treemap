@@ -52,6 +52,8 @@ select{border:1px solid var(--line);border-radius:999px;padding:7px 10px;backgro
 .mbox{background:#fff;border-radius:22px;padding:18px 18px 14px;width:min(560px,100%);max-height:90vh;overflow:auto;box-shadow:0 14px 40px rgba(20,30,50,.25)}
 .mhead{display:flex;justify-content:space-between;align-items:center}
 .mhead h2{margin:0;font-size:18px}
+.mclock{margin-left:auto;margin-right:10px;font-size:13px;font-weight:600;color:var(--soft);font-variant-numeric:tabular-nums;text-align:right;line-height:1.3}
+.mclock small{display:block;font-size:11px;font-weight:500}
 .mx{border:0;background:#f1f4f6;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:14px;color:var(--soft)}
 .mkpi{margin:10px 0 2px;font-size:13px;color:var(--soft)}
 .mkpi b{display:block;font-size:26px;color:var(--ink);font-variant-numeric:tabular-nums;margin-top:2px}
@@ -144,7 +146,7 @@ select{border:1px solid var(--line);border-radius:999px;padding:7px 10px;backgro
  </div></div>
  <div class="modal" id="wkmodal" hidden>
   <div class="mbox" role="dialog" aria-modal="true" aria-labelledby="wktitle">
-    <div class="mhead"><h2 id="wktitle">최근 한주 코스피</h2><button class="mx" id="wkx" type="button" aria-label="닫기">✕</button></div>
+    <div class="mhead"><h2 id="wktitle">최근 한주 코스피</h2><span class="mclock" id="wkclock"></span><button class="mx" id="wkx" type="button" aria-label="닫기">✕</button></div>
     <div class="mkpi" id="wkkpi"></div>
     <div class="mchart"><canvas id="wkc" aria-label="최근 한주 코스피 지수 차트"></canvas></div>
     <div class="mlist" id="wklist"></div>
@@ -409,9 +411,20 @@ function openWeek(){
     <b>${last.toLocaleString("ko-KR", {maximumFractionDigits: 2})}</b>`;
   $("wklist").innerHTML = W.map(x => `<div><span>${x.d}</span><span>${x.v.toLocaleString("ko-KR", {maximumFractionDigits: 2})}${x.r == null ? "" : ` <span style="color:${rcol(x.r)}">${sgn(x.r)}</span>`}</span></div>`).join("");
   wkm.hidden = false;
-  wkIntra = null;
+  wkIntra = null; wkAsOf = "";
   drawWeek(W);
-  loadIntra().then(j => { if (!wkm.hidden && j && j.bars && j.bars.length){ wkIntra = j; drawIntra(j); } });
+  tickClock(); clearInterval(clockT); clockT = setInterval(tickClock, 1000);
+  loadIntra().then(j => {
+    if (!wkm.hidden && j && j.bars && j.bars.length){
+      wkIntra = j; wkAsOf = j.bars[j.bars.length - 1][0].slice(5).replace("-", ".");
+      drawIntra(j); tickClock();
+    }
+  });
+}
+let clockT = null, wkAsOf = "";
+function tickClock(){                              // 현재 시각(KST) + 차트 데이터 기준 시각
+  const now = new Date().toLocaleTimeString("ko-KR", {timeZone: "Asia/Seoul", hour12: false, hour: "2-digit", minute: "2-digit", second: "2-digit"});
+  $("wkclock").innerHTML = `현재 ${now}` + (wkAsOf ? `<small>1분봉 기준 ${wkAsOf}</small>` : "");
 }
 let intraP = null, wkIntra = null;
 function loadIntra(){
@@ -419,7 +432,7 @@ function loadIntra(){
     .then(r => r.ok ? r.json() : null).catch(() => null);
   return intraP;
 }
-function drawIntra(j){                             // 5분봉 종가 전체를 한 주 단위로 채움
+function drawIntra(j){                             // 1분봉 종가 전체를 한 주 단위로 채움
   const r = wkc.getBoundingClientRect();
   wkc.width = Math.round(r.width * dpr); wkc.height = Math.round(r.height * dpr);
   const c = wkctx, w = r.width, h = r.height, padL = 54, padR = 16, padT = 16, padB = 28;
@@ -442,7 +455,7 @@ function drawIntra(j){                             // 5분봉 종가 전체를 �
   g.addColorStop(0, "rgba(23,165,139,.42)"); g.addColorStop(1, "rgba(23,165,139,.03)");
   c.fillStyle = g; c.fill();
   c.beginPath(); P.forEach((p, n) => n ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1]));
-  c.strokeStyle = "#17a58b"; c.lineWidth = 1.8; c.lineJoin = "round"; c.stroke();
+  c.strokeStyle = "#17a58b"; c.lineWidth = 1.4; c.lineJoin = "round"; c.stroke();
   // 날짜 구분선 + 날짜 라벨 (각 거래일 가운데)
   const starts = [0];
   for (let n = 1; n < M; n++) if (B[n][0].slice(0, 10) !== B[n - 1][0].slice(0, 10)) starts.push(n);
@@ -500,7 +513,7 @@ function drawWeek(W){
     c.fillText(x.d.slice(5), px, h - 8);
   });
 }
-function closeWeek(){ wkm.hidden = true; }
+function closeWeek(){ wkm.hidden = true; clearInterval(clockT); }
 $("wkbtn").onclick = openWeek;
 $("wkx").onclick = closeWeek;
 wkm.addEventListener("click", e => { if (e.target === wkm) closeWeek(); });

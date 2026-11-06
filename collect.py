@@ -137,20 +137,22 @@ except Exception as e:
 ixh[["Close"]].rename(columns={"Close": "close"}).reset_index().to_csv("data/kospi_index.csv", index=False)
 print("index rows", len(ixh))
 
-# ---- 6) 코스피 5분봉 (최근 한 주, 주간 차트용) — 실패해도 일별 파이프라인은 계속
+# ---- 6) 코스피 1분봉 (최근 5거래일, 주간 차트용) — 실패해도 일별 파이프라인은 계속
+# 야후 1분봉은 최근 7일(달력 기준)까지만 제공
 try:
-    im = yf.Ticker("^KS11").history(period="10d", interval="5m")
+    import json
+    im = yf.Ticker("^KS11").history(period="7d", interval="1m")
+    print("intraday raw rows", len(im))
     if len(im):
         im.index = im.index.tz_convert("Asia/Seoul")
+        im = im.dropna(subset=["Close"])
         days = sorted(set(im.index.normalize()))[-5:]
-        im = im[im.index.normalize().isin(days)].dropna(subset=["Close"])
-        c10 = im["Close"].resample("10min", origin="start_day").last().dropna()   # 5분봉 → 10분봉 (구간 마지막 종가)
-        c10 = c10[c10.index.normalize().isin(days)]
-        bars = [[t.strftime("%Y-%m-%d %H:%M"), round(float(v), 2)] for t, v in c10.items()]
-        import json
+        im = im[im.index.normalize().isin(days)]
+        bars = [[t.strftime("%Y-%m-%d %H:%M"), round(float(v), 2)] for t, v in im["Close"].items()]
         os.makedirs("site", exist_ok=True)
-        json.dump({"bars": bars, "days": [d.strftime("%Y-%m-%d") for d in days]},
-                  open("site/intraday.json", "w", encoding="utf-8"), ensure_ascii=False)
-        print("intraday bars", len(bars), "days", len(days))
+        json.dump({"interval": "1m", "bars": bars, "days": [d.strftime("%Y-%m-%d") for d in days],
+                   "generated": pd.Timestamp.now(tz="Asia/Seoul").strftime("%Y-%m-%d %H:%M")},
+                  open("site/intraday.json", "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
+        print("intraday bars", len(bars), "days", len(days), "last", bars[-1] if bars else None)
 except Exception as e:
     print("intraday fetch failed", repr(e)[:200])
