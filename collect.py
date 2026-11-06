@@ -136,3 +136,19 @@ except Exception as e:
     print("naver index fill failed", repr(e)[:200])
 ixh[["Close"]].rename(columns={"Close": "close"}).reset_index().to_csv("data/kospi_index.csv", index=False)
 print("index rows", len(ixh))
+
+# ---- 6) 코스피 5분봉 (최근 한 주, 주간 차트용) — 실패해도 일별 파이프라인은 계속
+try:
+    im = yf.Ticker("^KS11").history(period="10d", interval="5m")
+    if len(im):
+        im.index = im.index.tz_convert("Asia/Seoul")
+        days = sorted(set(im.index.normalize()))[-5:]
+        im = im[im.index.normalize().isin(days)].dropna(subset=["Close"])
+        bars = [[t.strftime("%Y-%m-%d %H:%M"), round(float(v), 2)] for t, v in zip(im.index, im["Close"])]
+        import json
+        os.makedirs("site", exist_ok=True)
+        json.dump({"bars": bars, "days": [d.strftime("%Y-%m-%d") for d in days]},
+                  open("site/intraday.json", "w", encoding="utf-8"), ensure_ascii=False)
+        print("intraday bars", len(bars), "days", len(days))
+except Exception as e:
+    print("intraday fetch failed", repr(e)[:200])

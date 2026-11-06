@@ -409,7 +409,54 @@ function openWeek(){
     <b>${last.toLocaleString("ko-KR", {maximumFractionDigits: 2})}</b>`;
   $("wklist").innerHTML = W.map(x => `<div><span>${x.d}</span><span>${x.v.toLocaleString("ko-KR", {maximumFractionDigits: 2})}${x.r == null ? "" : ` <span style="color:${rcol(x.r)}">${sgn(x.r)}</span>`}</span></div>`).join("");
   wkm.hidden = false;
+  wkIntra = null;
   drawWeek(W);
+  loadIntra().then(j => { if (!wkm.hidden && j && j.bars && j.bars.length){ wkIntra = j; drawIntra(j); } });
+}
+let intraP = null, wkIntra = null;
+function loadIntra(){
+  if (!intraP) intraP = fetch("intraday.json?v=" + Math.floor(Date.now() / 300000))
+    .then(r => r.ok ? r.json() : null).catch(() => null);
+  return intraP;
+}
+function drawIntra(j){                             // 5분봉 종가 전체를 한 주 단위로 채움
+  const r = wkc.getBoundingClientRect();
+  wkc.width = Math.round(r.width * dpr); wkc.height = Math.round(r.height * dpr);
+  const c = wkctx, w = r.width, h = r.height, padL = 54, padR = 16, padT = 16, padB = 28;
+  c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, w, h);
+  const B = j.bars, M = B.length, vals = B.map(b => b[1]);
+  const lo0 = Math.min(...vals), hi0 = Math.max(...vals), pad = (hi0 - lo0) * .12 || hi0 * .002;
+  const lo = lo0 - pad, hi = hi0 + pad, span = hi - lo;
+  const X = n => padL + (w - padL - padR) * (M === 1 ? .5 : n / (M - 1));
+  const Y = v => padT + (h - padT - padB) * (1 - (v - lo) / span);
+  c.font = "500 11px Pretendard,sans-serif"; c.textBaseline = "middle"; c.textAlign = "right"; c.fillStyle = SOFT;
+  for (let k = 0; k <= 3; k++){
+    const v = lo + span * k / 3, y = Y(v);
+    c.strokeStyle = "#eef1f4"; c.lineWidth = 1; c.beginPath(); c.moveTo(padL, y); c.lineTo(w - padR, y); c.stroke();
+    c.fillText(v.toLocaleString("ko-KR", {maximumFractionDigits: 0}), padL - 6, y);
+  }
+  const P = B.map((b, n) => [X(n), Y(b[1])]);
+  c.beginPath(); P.forEach((p, n) => n ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1]));
+  c.lineTo(P[M - 1][0], h - padB); c.lineTo(P[0][0], h - padB); c.closePath();
+  const g = c.createLinearGradient(0, padT, 0, h - padB);
+  g.addColorStop(0, "rgba(23,165,139,.42)"); g.addColorStop(1, "rgba(23,165,139,.03)");
+  c.fillStyle = g; c.fill();
+  c.beginPath(); P.forEach((p, n) => n ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1]));
+  c.strokeStyle = "#17a58b"; c.lineWidth = 1.8; c.lineJoin = "round"; c.stroke();
+  // 날짜 구분선 + 날짜 라벨 (각 거래일 가운데)
+  const starts = [0];
+  for (let n = 1; n < M; n++) if (B[n][0].slice(0, 10) !== B[n - 1][0].slice(0, 10)) starts.push(n);
+  c.textAlign = "center"; c.textBaseline = "alphabetic"; c.font = "500 11px Pretendard,sans-serif";
+  starts.forEach((s, k) => {
+    const e = k + 1 < starts.length ? starts[k + 1] : M;
+    if (k > 0){ c.strokeStyle = "#dfe5ea"; c.setLineDash([3, 4]); c.beginPath(); c.moveTo(X(s), padT); c.lineTo(X(s), h - padB); c.stroke(); c.setLineDash([]); }
+    c.fillStyle = SOFT; c.fillText(B[s][0].slice(5, 10), (X(s) + X(e - 1)) / 2, h - 8);
+  });
+  const last = P[M - 1];
+  c.fillStyle = "#0f8a74"; c.beginPath(); c.arc(last[0], last[1], 4, 0, 7); c.fill();
+  c.strokeStyle = "#fff"; c.lineWidth = 2; c.stroke();
+  c.fillStyle = INK; c.font = "600 11px Pretendard,sans-serif"; c.textAlign = "right";
+  c.fillText(vals[M - 1].toLocaleString("ko-KR", {maximumFractionDigits: 2}), last[0] - 8, last[1] - 10);
 }
 function drawWeek(W){
   const r = wkc.getBoundingClientRect();
@@ -458,7 +505,7 @@ $("wkbtn").onclick = openWeek;
 $("wkx").onclick = closeWeek;
 wkm.addEventListener("click", e => { if (e.target === wkm) closeWeek(); });
 document.addEventListener("keydown", e => { if (e.key === "Escape" && !wkm.hidden) closeWeek(); });
-window.addEventListener("resize", () => { if (!wkm.hidden && D) drawWeek(weekData()); });
+window.addEventListener("resize", () => { if (!wkm.hidden && D) wkIntra ? drawIntra(wkIntra) : drawWeek(weekData()); });
 
 // ---------- 시작 ----------
 fetch("data.json?v=" + Date.now()).then(r => r.json()).then(async d => {
