@@ -426,10 +426,22 @@ function drawWeek(W){
     c.strokeStyle = "#eef1f4"; c.lineWidth = 1; c.beginPath(); c.moveTo(padL, y); c.lineTo(w - padR, y); c.stroke();
     c.fillText(Math.round(v).toLocaleString("ko-KR"), padL - 6, y);
   }
-  c.beginPath(); W.forEach((x, n) => n ? c.lineTo(X(n), Y(x.v)) : c.moveTo(X(n), Y(x.v)));
-  c.strokeStyle = "#17a58b"; c.lineWidth = 2; c.lineJoin = "round"; c.stroke();
-  c.lineTo(X(W.length - 1), h - padB); c.lineTo(X(0), h - padB); c.closePath();
-  c.fillStyle = "rgba(60,208,180,.16)"; c.fill();
+  const P = W.map((x, n) => [X(n), Y(x.v)]);
+  const curve = () => {                           // Catmull-Rom → 베지어: 점 사이를 부드러운 곡선으로
+    c.moveTo(P[0][0], P[0][1]);
+    for (let n = 0; n < P.length - 1; n++){
+      const p0 = P[n - 1] || P[n], p1 = P[n], p2 = P[n + 1], p3 = P[n + 2] || p2;
+      c.bezierCurveTo(p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6,
+                      p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6, p2[0], p2[1]);
+    }
+  };
+  c.beginPath(); curve();
+  c.lineTo(P[P.length - 1][0], h - padB); c.lineTo(P[0][0], h - padB); c.closePath();
+  const g = c.createLinearGradient(0, padT, 0, h - padB);   // 곡선 아래를 세로 그라데이션으로 채움
+  g.addColorStop(0, "rgba(23,165,139,.42)"); g.addColorStop(1, "rgba(23,165,139,.03)");
+  c.fillStyle = g; c.fill();
+  c.beginPath(); curve();
+  c.strokeStyle = "#17a58b"; c.lineWidth = 2.2; c.lineJoin = "round"; c.stroke();
   c.textAlign = "center"; c.textBaseline = "alphabetic"; c.font = "500 11px Pretendard,sans-serif";
   W.forEach((x, n) => {
     const px = X(n), py = Y(x.v);
