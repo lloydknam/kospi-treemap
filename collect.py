@@ -149,6 +149,16 @@ try:
         days = sorted(set(im.index.normalize()))[-5:]
         im = im[im.index.normalize().isin(days)]
         bars = [[t.strftime("%Y-%m-%d %H:%M"), round(float(v), 2)] for t, v in im["Close"].items()]
+        # 야후 1분봉은 15:00 전후에서 끊김 → 각 거래일 끝에 일별 종가를 15:30 봉으로 붙임
+        dclose = ixh["Close"].dropna()
+        out_b = []
+        for d in days:
+            ds = d.strftime("%Y-%m-%d")
+            out_b += [b for b in bars if b[0].startswith(ds)]
+            cl = dclose.get(pd.Timestamp(ds))
+            if cl is not None and out_b and out_b[-1][0] < ds + " 15:30":
+                out_b.append([ds + " 15:30", round(float(cl), 2)])
+        bars = out_b
         os.makedirs("site", exist_ok=True)
         json.dump({"interval": "1m", "bars": bars, "days": [d.strftime("%Y-%m-%d") for d in days],
                    "generated": pd.Timestamp.now(tz="Asia/Seoul").strftime("%Y-%m-%d %H:%M")},
