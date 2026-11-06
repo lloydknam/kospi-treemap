@@ -144,7 +144,9 @@ try:
         im.index = im.index.tz_convert("Asia/Seoul")
         days = sorted(set(im.index.normalize()))[-5:]
         im = im[im.index.normalize().isin(days)].dropna(subset=["Close"])
-        bars = [[t.strftime("%Y-%m-%d %H:%M"), round(float(v), 2)] for t, v in zip(im.index, im["Close"])]
+        c10 = im["Close"].resample("10min", origin="start_day").last().dropna()   # 5분봉 → 10분봉 (구간 마지막 종가)
+        c10 = c10[c10.index.normalize().isin(days)]
+        bars = [[t.strftime("%Y-%m-%d %H:%M"), round(float(v), 2)] for t, v in c10.items()]
         import json
         os.makedirs("site", exist_ok=True)
         json.dump({"bars": bars, "days": [d.strftime("%Y-%m-%d") for d in days]},
