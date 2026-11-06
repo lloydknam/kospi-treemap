@@ -45,6 +45,20 @@ input[type=range]{flex:1;min-width:140px;accent-color:var(--teal);height:28px}
 .seg button{border:0;background:transparent;padding:7px 13px;font-size:13px;font-weight:600;color:var(--soft);cursor:pointer}
 .seg button.on{background:var(--teal);color:#fff}
 select{border:1px solid var(--line);border-radius:999px;padding:7px 10px;background:#f6f9f9;font-size:13px;font-weight:600}
+.wk{border:1px solid var(--line);border-radius:999px;padding:7px 13px;background:#f6f9f9;font-size:13px;font-weight:600;color:var(--teal-d);cursor:pointer}
+.wk:hover{background:#eaf6f3}
+.modal{position:fixed;inset:0;background:rgba(30,40,60,.45);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50}
+.modal[hidden]{display:none}
+.mbox{background:#fff;border-radius:22px;padding:18px 18px 14px;width:min(560px,100%);max-height:90vh;overflow:auto;box-shadow:0 14px 40px rgba(20,30,50,.25)}
+.mhead{display:flex;justify-content:space-between;align-items:center}
+.mhead h2{margin:0;font-size:18px}
+.mx{border:0;background:#f1f4f6;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:14px;color:var(--soft)}
+.mkpi{margin:10px 0 2px;font-size:13px;color:var(--soft)}
+.mkpi b{display:block;font-size:26px;color:var(--ink);font-variant-numeric:tabular-nums;margin-top:2px}
+.mchart{position:relative;width:100%;aspect-ratio:100/60;margin-top:10px}
+.mchart canvas{display:block;width:100%;height:100%}
+.mlist{margin-top:10px;font-size:13px}
+.mlist div{display:flex;justify-content:space-between;padding:6px 2px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
 .legend{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--soft);margin-left:auto}
 .legend i{display:block;width:110px;height:10px;border-radius:5px;background:linear-gradient(90deg,#7fb8ff,#b9d8ff,#f6f4fa,#ffc6cf,#ff8fa3)}
 .foot{display:flex;justify-content:space-between;gap:12px;margin-top:12px;font-size:11.5px;color:var(--soft);flex-wrap:wrap}
@@ -121,6 +135,7 @@ select{border:1px solid var(--line);border-radius:999px;padding:7px 10px;backgro
     <select id="speed" aria-label="재생 속도">
       <option value="5">느리게</option><option value="11" selected>보통</option><option value="24">빠르게</option><option value="48">아주 빠르게</option>
     </select>
+    <button class="wk" id="wkbtn" type="button">차트 보기</button>
     <div class="legend"><span>−3%</span><i></i><span>+3%</span></div>
   </div>
 
@@ -128,6 +143,14 @@ select{border:1px solid var(--line);border-radius:999px;padding:7px 10px;backgro
     <span id="src">출처: 네이버 증권, Yahoo Finance</span>
   </div>
  </div></div>
+ <div class="modal" id="wkmodal" hidden>
+  <div class="mbox" role="dialog" aria-modal="true" aria-labelledby="wktitle">
+    <div class="mhead"><h2 id="wktitle">최근 한주 코스피</h2><button class="mx" id="wkx" type="button" aria-label="닫기">✕</button></div>
+    <div class="mkpi" id="wkkpi"></div>
+    <div class="mchart"><canvas id="wkc" aria-label="최근 한주 코스피 지수 차트"></canvas></div>
+    <div class="mlist" id="wklist"></div>
+  </div>
+ </div>
  <div class="note" id="note"></div>
  <footer class="site-foot">
   <a class="c" href="https://github.com/lloydknam" target="_blank" rel="noopener" title="GitHub(@lloydknam)"><img src="assets/brand/lockup-light.svg" alt="Lloyd's Balcony Lab · with claude · GitHub(@lloydknam)" height="40"></a>
@@ -361,7 +384,7 @@ function seek(e){
   pos = Math.max(0, Math.min(N - 1, n)); setPlaying(false); draw(); saveHash();
 }
 document.addEventListener("keydown", e => {
-  if (e.target.tagName === "SELECT") return;
+  if (e.target.tagName === "SELECT" || !$("wkmodal").hidden) return;
   if (e.code === "Space"){ e.preventDefault(); setPlaying(!playing); }
   else if (e.code === "ArrowLeft" || e.code === "ArrowRight"){
     pos = Math.max(0, Math.min(N - 1, Math.round(pos) + (e.code === "ArrowLeft" ? -1 : 1) * (e.shiftKey ? 10 : 1)));
@@ -369,6 +392,64 @@ document.addEventListener("keydown", e => {
   }
 });
 let ht; function saveHash(){ clearTimeout(ht); ht = setTimeout(() => { try { history.replaceState(null, "", `#d=${D.dates[Math.round(pos)]}&m=${mode}`); } catch (_) {} }, 200); }
+
+// ---------- 최근 한주 차트 팝업 ----------
+const wkm = $("wkmodal"), wkc = $("wkc"), wkctx = wkc.getContext("2d");
+function weekData(){
+  const s = Math.max(0, N - 5);
+  return D.dates.slice(s).map((d, k) => {
+    const n = s + k, prev = n > 0 ? D.index[n - 1] : null;
+    return {d, v: D.index[n], r: prev ? (D.index[n] / prev - 1) * 100 : null};
+  });
+}
+const sgn = r => (r > 0 ? "+" : "") + r.toFixed(2) + "%";
+const rcol = r => r > 0 ? "var(--up)" : r < 0 ? "var(--down)" : "inherit";
+function openWeek(){
+  if (!D) return;
+  const W = weekData(), base = N - 6 >= 0 ? D.index[N - 6] : W[0].v, last = W[W.length - 1].v;
+  const wr = (last / base - 1) * 100;
+  $("wkkpi").innerHTML = `${W[0].d} ~ ${W[W.length - 1].d} · 주간 등락 <span style="color:${rcol(wr)};font-weight:700">${sgn(wr)}</span>
+    <b>${last.toLocaleString("ko-KR", {maximumFractionDigits: 2})}</b>`;
+  $("wklist").innerHTML = W.map(x => `<div><span>${x.d}</span><span>${x.v.toLocaleString("ko-KR", {maximumFractionDigits: 2})}${x.r == null ? "" : ` <span style="color:${rcol(x.r)}">${sgn(x.r)}</span>`}</span></div>`).join("");
+  wkm.hidden = false;
+  drawWeek(W);
+}
+function drawWeek(W){
+  const r = wkc.getBoundingClientRect();
+  wkc.width = Math.round(r.width * dpr); wkc.height = Math.round(r.height * dpr);
+  const c = wkctx, w = r.width, h = r.height, padL = 54, padR = 16, padT = 16, padB = 28;
+  c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, w, h);
+  const vals = W.map(x => x.v), lo0 = Math.min(...vals), hi0 = Math.max(...vals), pad = (hi0 - lo0) * .15 || hi0 * .002;
+  const lo = lo0 - pad, hi = hi0 + pad, span = hi - lo;
+  const X = n => padL + (w - padL - padR) * (W.length === 1 ? .5 : n / (W.length - 1));
+  const Y = v => padT + (h - padT - padB) * (1 - (v - lo) / span);
+  c.font = "500 11px Pretendard,sans-serif"; c.textBaseline = "middle"; c.textAlign = "right"; c.fillStyle = SOFT;
+  for (let k = 0; k <= 3; k++){
+    const v = lo + span * k / 3, y = Y(v);
+    c.strokeStyle = "#eef1f4"; c.lineWidth = 1; c.beginPath(); c.moveTo(padL, y); c.lineTo(w - padR, y); c.stroke();
+    c.fillText(Math.round(v).toLocaleString("ko-KR"), padL - 6, y);
+  }
+  c.beginPath(); W.forEach((x, n) => n ? c.lineTo(X(n), Y(x.v)) : c.moveTo(X(n), Y(x.v)));
+  c.strokeStyle = "#17a58b"; c.lineWidth = 2; c.lineJoin = "round"; c.stroke();
+  c.lineTo(X(W.length - 1), h - padB); c.lineTo(X(0), h - padB); c.closePath();
+  c.fillStyle = "rgba(60,208,180,.16)"; c.fill();
+  c.textAlign = "center"; c.textBaseline = "alphabetic"; c.font = "500 11px Pretendard,sans-serif";
+  W.forEach((x, n) => {
+    const px = X(n), py = Y(x.v);
+    c.fillStyle = "#0f8a74"; c.beginPath(); c.arc(px, py, 4, 0, 7); c.fill();
+    c.strokeStyle = "#fff"; c.lineWidth = 2; c.stroke();
+    c.fillStyle = INK; c.font = "600 11px Pretendard,sans-serif";
+    c.fillText(x.v.toLocaleString("ko-KR", {maximumFractionDigits: 2}), px, py - 10);
+    c.fillStyle = SOFT; c.font = "500 11px Pretendard,sans-serif";
+    c.fillText(x.d.slice(5), px, h - 8);
+  });
+}
+function closeWeek(){ wkm.hidden = true; }
+$("wkbtn").onclick = openWeek;
+$("wkx").onclick = closeWeek;
+wkm.addEventListener("click", e => { if (e.target === wkm) closeWeek(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !wkm.hidden) closeWeek(); });
+window.addEventListener("resize", () => { if (!wkm.hidden && D) drawWeek(weekData()); });
 
 // ---------- 시작 ----------
 fetch("data.json?v=" + Date.now()).then(r => r.json()).then(async d => {
