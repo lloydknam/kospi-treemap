@@ -1,7 +1,7 @@
 naver stocks 940
 naver marketStatus OPEN trade date 2026-11-06 00:00:00 use False
-probe 005930 189,900 2026-11-06T17:20:23+09:00 OPEN {'tradingSessionType': 'AFTER_MARKET', 'overMarketStatus': 'OPEN', 'overPrice': '189,900', 'localTradedAt': '2026-11-06T17:21:00.677+09:00'} 1630
-probe 000660 1,148,000 2026-11-06T17:20:24+09:00 OPEN {'tradingSessionType': 'AFTER_MARKET', 'overMarketStatus': 'OPEN', 'overPrice': '1,149,000', 'localTradedAt': '2026-11-06T17:21:00.677+09:00'} 1630
+probe 005930 189,900 2026-11-06T17:40:23+09:00 OPEN {'tradingSessionType': 'AFTER_MARKET', 'overMarketStatus': 'OPEN', 'overPrice': '190,000', 'localTradedAt': '2026-11-06T17:40:32.342+09:00'} 1630
+probe 000660 1,148,000 2026-11-06T17:40:24+09:00 OPEN {'tradingSessionType': 'AFTER_MARKET', 'overMarketStatus': 'OPEN', 'overPrice': '1,148,000', 'localTradedAt': '2026-11-06T17:40:32.342+09:00'} 1630
 batch 0 got 80
 batch 80 got 160
 batch 160 got 240
@@ -48,4 +48,5 @@ dropped 28
   drop ('145210', '다이나믹디자인', 'jump', np.float64(9.0))
 saved 411104 rows 455 days 912 tickers
 index rows 455
-intraday bars 180 days 5
+intraday raw rows 2518
+intraday bars 1803 days 5 last ['2026-11-06 15:30', 5059.69]
