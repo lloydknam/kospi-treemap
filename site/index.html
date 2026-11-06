@@ -35,7 +35,7 @@ canvas{display:block;width:100%;height:100%}
 .readout .k{font-size:12px;color:var(--soft);font-weight:600}
 .readout .v{font-size:clamp(30px,6.2vw,56px);font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
 .readout .v.cap{color:var(--teal-d)}
-.chart{position:relative;width:100%;aspect-ratio:100/17;max-height:150px;margin-top:2px}
+.chart{position:relative;width:100%;aspect-ratio:100/17;max-height:176px;margin-top:2px}
 .controls{display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap}
 button,select{font:inherit;color:var(--ink)}
 .play{width:42px;height:42px;border-radius:50%;border:0;background:linear-gradient(135deg,#3cd0b4,#15977f);color:#fff;font-size:16px;cursor:pointer;flex:none;display:grid;place-items:center}
@@ -77,7 +77,7 @@ select{border:1px solid var(--line);border-radius:999px;padding:7px 10px;backgro
   .stage{margin-top:8px;max-height:max(190px,calc(100vh - 335px))}
   .readout{margin-top:6px}
   .readout .v{font-size:clamp(24px,4vw,40px)}
-  .chart{max-height:78px}
+  .chart{max-height:100px}
   .controls{margin-top:6px}
   .foot{margin-top:6px}
 }
@@ -95,7 +95,7 @@ select{border:1px solid var(--line);border-radius:999px;padding:7px 10px;backgro
   .readout{margin-top:8px}
   .readout .v{font-size:clamp(24px,7vw,32px)}
   .readout .k{font-size:11px}
-  .chart{aspect-ratio:100/26;max-height:72px}
+  .chart{aspect-ratio:100/26;max-height:96px}
   .foot{display:none}
   .controls{gap:8px;margin-top:4px}
   .play{width:38px;height:38px}
@@ -108,10 +108,9 @@ select{border:1px solid var(--line);border-radius:999px;padding:7px 10px;backgro
 <div class="wrap">
  <div class="frame"><div class="card">
   <div class="head">
-    <div class="date" id="date">—<small id="dow"></small></div>
+    <div class="date" id="date"><span id="dtxt">—</span></div>
     <div class="title">
       <h1>KOSPI 시가총액 지도</h1>
-      <p id="sub">면적 = 시가총액(절대값) · 점선 = 기간 최고 · 색 = 전일대비</p>
     </div>
   </div>
 
@@ -228,7 +227,7 @@ function resize(){
   ixc.width = Math.round(iw * dpr); ixc.height = Math.round(ih * dpr);
   draw();
 }
-new ResizeObserver(resize).observe($("stage"));
+const ro = new ResizeObserver(resize); ro.observe($("stage")); ro.observe($("ix"));
 
 function lerp(a, b, f){ return a + (b - a) * f; }
 function draw(){
@@ -292,9 +291,8 @@ function draw(){
   }
   drawIndex(i, j, f);
   const di = Math.round(pos);
-  $("date").firstChild.nodeValue = D.dates[di];
   const dt = new Date(D.dates[di] + "T00:00:00");
-  $("dow").textContent = DOW[dt.getDay()] + "요일";
+  $("dtxt").textContent = D.dates[di].slice(2).replace(/-/g, ".") + " " + DOW[dt.getDay()] + "요일";
   $("capv").textContent = Math.round(tot / 1e4).toLocaleString("ko-KR") + "조원";
   $("ixv").textContent = lerp(D.index[i], D.index[j], f).toLocaleString("ko-KR", {maximumFractionDigits: 0});
   const pv = D.index[di - 1], cv = D.index[di], ce = $("ixc");
@@ -375,7 +373,6 @@ $("speed").onchange = e => speed = +e.target.value;
 document.querySelectorAll("#mode button").forEach(b => b.onclick = () => {
   mode = b.dataset.m;
   document.querySelectorAll("#mode button").forEach(x => x.classList.toggle("on", x === b));
-  $("sub").textContent = mode === "abs" ? "면적 = 시가총액(절대값) · 점선 = 기간 최고 · 색 = 전일대비" : "면적 = 시가총액(비중) · 색 = 전일대비 등락률";
   draw(); saveHash();
 });
 ixc.addEventListener("pointerdown", seek); ixc.addEventListener("pointermove", e => { if (e.buttons) seek(e); });
@@ -465,7 +462,7 @@ fetch("data.json?v=" + Date.now()).then(r => r.json()).then(async d => {
   $("note").textContent = `출처: 네이버 증권·Yahoo Finance. ${d.dates[0]} ~ ${d.updated} · ${d.tickers.length.toLocaleString()}개 종목(우선주 포함). 매 평일 장 마감 후 자동 갱신됩니다. 시가총액은 종가에 현재 주식수(상위 종목은 증자·소각 반영)를 곱한 근사치라 KRX 공식 수치와 다를 수 있습니다. 단축키: 스페이스 재생, ←/→ 하루 이동(Shift는 10일).`;
   try { await document.fonts.load("700 14px Pretendard"); await document.fonts.load("500 14px Pretendard"); } catch (_) {}
   resize();
-}).catch(e => { $("date").firstChild.nodeValue = "데이터를 불러오지 못했어요"; console.error(e); });
+}).catch(e => { $("dtxt").textContent = "데이터를 불러오지 못했어요"; console.error(e); });
 })();
 </script>
 </body>
