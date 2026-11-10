@@ -1,7 +1,7 @@
-naver stocks 940
-naver marketStatus CLOSE trade date 2026-11-09 00:00:00 use True
-probe 005930 187,000 2026-11-09T20:20:24+09:00 CLOSE {'tradingSessionType': '', 'overMarketStatus': 'PREOPEN', 'overPrice': '189,900', 'localTradedAt': '2026-11-10T07:23:28.715+09:00'} 1630
-probe 000660 1,115,000 2026-11-09T20:20:25+09:00 CLOSE {'tradingSessionType': '', 'overMarketStatus': 'PREOPEN', 'overPrice': '1,136,000', 'localTradedAt': '2026-11-10T07:23:28.715+09:00'} 1630
+naver stocks 937
+naver marketStatus OPEN trade date 2026-11-10 00:00:00 use False
+probe 005930 198,800 2026-11-10T16:40:20+09:00 OPEN {'tradingSessionType': 'AFTER_MARKET', 'overMarketStatus': 'OPEN', 'overPrice': '198,600', 'localTradedAt': '2026-11-10T16:40:53.475+09:00'} 1630
+probe 000660 1,212,000 2026-11-10T16:40:23+09:00 OPEN {'tradingSessionType': 'AFTER_MARKET', 'overMarketStatus': 'OPEN', 'overPrice': '1,211,000', 'localTradedAt': '2026-11-10T16:40:53.475+09:00'} 1630
 batch 0 got 80
 batch 80 got 160
 batch 160 got 240
@@ -12,13 +12,11 @@ batch 480 got 560
 batch 560 got 640
 batch 640 got 720
 batch 720 got 800
-Failed to get ticker '143210.KS' reason: Failed to perform, curl: (28) Operation timed out after 10001 milliseconds with 0 bytes received. See https://curl.se/libcurl/c/libcurl-errors.html first for more details.
 batch 800 got 880
-Failed to get ticker '023150.KS' reason: Failed to perform, curl: (28) Operation timed out after 10001 milliseconds with 0 bytes received. See https://curl.se/libcurl/c/libcurl-errors.html first for more details.
-batch 880 got 940
-tickers with prices 940 of 940
+batch 880 got 937
+tickers with prices 937 of 937
 share-ratio tickers 115
-naver-filled tickers for 2026-11-09 00:00:00 : 1
+naver-filled tickers for None : 0
 dropped 28
   drop ('007070', 'GS리테일', 'jump', np.float64(0.34))
   drop ('005180', '빙그레', 'jump', np.float64(0.54))
@@ -48,9 +46,7 @@ dropped 28
   drop ('006490', '프리티', 'jump', np.float64(0.48))
   drop ('019685', '대교우B', 'jump', np.float64(1.0))
   drop ('145210', '다이나믹디자인', 'jump', np.float64(9.0))
-saved 412016 rows 456 days 912 tickers
-naver index resp {'stockEndType': 'index', 'itemCode': 'KOSPI', 'reutersCode': 'KOSPI', 'symbolCode': 'KOSPI', 'stockName': '코스피', 'itemLogoUrl': 'https://ssl.pstatic.net/imgstock/fn/real/logo/index/IndexKOSPI.svg', 'itemLogoPngUrl': 'https://ssl.pstatic.net/imgstock/fn/real/logo/png/index/IndexKOSPI.png', 'closePrice': '5,018.85', 'compareToPreviousClosePrice': '-40.84', 'compareToPreviousPrice': {'code': '5', 't
-index filled from naver 2026-11-09 00:00:00 5018.85
-index rows 456
+saved 411557 rows 457 days 909 tickers
+index rows 457
 intraday raw rows 2518
-intraday bars 1803 days 5 last ['2026-11-09 15:30', 5018.85]
+intraday bars 1805 days 5 last ['2026-11-10 15:30', 5239.13]
