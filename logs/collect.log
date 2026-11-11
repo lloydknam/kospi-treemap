@@ -1,57 +1,52 @@
 naver stocks 938
-naver marketStatus CLOSE trade date 2026-11-10 00:00:00 use True
-probe 005930 197,300 2026-11-10T20:20:21+09:00 CLOSE {'tradingSessionType': 'AFTER_MARKET', 'overMarketStatus': 'CLOSE', 'overPrice': '197,300', 'localTradedAt': '2026-11-10T20:00:00+09:00'} 1630
-probe 000660 1,198,000 2026-11-10T20:20:24+09:00 CLOSE {'tradingSessionType': 'AFTER_MARKET', 'overMarketStatus': 'CLOSE', 'overPrice': '1,198,000', 'localTradedAt': '2026-11-10T20:00:00+09:00'} 1630
-
-1 Failed download:
-['064400.KS']: OperationalError('database is locked')
-batch 0 got 79
-batch 80 got 159
-batch 160 got 239
-batch 240 got 319
-batch 320 got 399
-batch 400 got 479
-batch 480 got 559
-batch 560 got 639
-batch 640 got 719
-batch 720 got 799
-batch 800 got 879
-batch 880 got 937
-tickers with prices 937 of 938
-share-ratio tickers 114
-naver-filled tickers for 2026-11-10 00:00:00 : 934
+naver marketStatus OPEN trade date 2026-11-11 00:00:00 use False
+probe 005930 205,000 2026-11-11T16:40:22+09:00 OPEN {'tradingSessionType': 'AFTER_MARKET', 'overMarketStatus': 'OPEN', 'overPrice': '205,000', 'localTradedAt': '2026-11-11T16:40:48.955+09:00'} 1630
+probe 000660 1,273,000 2026-11-11T16:40:21+09:00 OPEN {'tradingSessionType': 'AFTER_MARKET', 'overMarketStatus': 'OPEN', 'overPrice': '1,272,000', 'localTradedAt': '2026-11-11T16:40:48.955+09:00'} 1630
+batch 0 got 80
+batch 80 got 160
+batch 160 got 240
+batch 240 got 320
+batch 320 got 400
+batch 400 got 480
+batch 480 got 560
+batch 560 got 640
+batch 640 got 720
+batch 720 got 800
+batch 800 got 880
+batch 880 got 938
+tickers with prices 938 of 938
+share-ratio tickers 115
+naver-filled tickers for None : 0
 dropped 28
   drop ('007070', 'GS리테일', 'jump', np.float64(0.34))
   drop ('005180', '빙그레', 'jump', np.float64(0.54))
-  drop ('094800', '맵스리얼티', 'jump', np.float64(0.47))
-  drop ('011810', 'STX', 'jump', np.float64(115.28))
+  drop ('094800', '맵스리얼티', 'px mismatch', np.float64(1.87))
+  drop ('011810', 'STX', 'px mismatch', np.float64(22.36))
   drop ('161000', '애경케미칼', 'jump', np.float64(0.59))
   drop ('003620', 'KG모빌리티', 'jump', np.float64(0.8))
   drop ('000070', '삼양홀딩스', 'jump', np.float64(0.46))
   drop ('009160', 'SIMPAC', 'jump', np.float64(0.52))
-  drop ('001470', '삼부토건', 'jump', np.float64(26.17))
-  drop ('000300', 'DH오토넥스', 'jump', np.float64(8.0))
+  drop ('001470', '삼부토건', 'px mismatch', np.float64(1.62))
+  drop ('000300', 'DH오토넥스', 'px mismatch', np.float64(5020.53))
   drop ('298000', '효성화학', 'jump', np.float64(0.41))
   drop ('210980', 'SK디앤디', 'jump', np.float64(0.33))
   drop ('002210', '동성제약', 'jump', np.float64(0.85))
-  drop ('119650', 'KC코트렐', 'jump', np.float64(2.45))
+  drop ('119650', 'KC코트렐', 'px mismatch', np.float64(1.72))
   drop ('417310', '코람코더원리츠', 'jump', np.float64(0.79))
   drop ('109070', '주성코퍼레이션', 'jump', np.float64(0.38))
-  drop ('214330', '금호에이치티', 'jump', np.float64(0.77))
   drop ('019680', '대교', 'jump', np.float64(1.0))
+  drop ('214330', '금호에이치티', 'jump', np.float64(0.77))
   drop ('007610', '선도전기', 'jump', np.float64(1.18))
   drop ('069460', '대호에이엘', 'jump', np.float64(4.0))
   drop ('074610', '이엔플러스', 'jump', np.float64(9.0))
-  drop ('017040', '광명전기', 'jump', np.float64(4.0))
+  drop ('017040', '광명전기', 'px mismatch', np.float64(5.0))
   drop ('009310', '참엔지니어링', 'jump', np.float64(4.0))
   drop ('015020', '이스타코', 'jump', np.float64(1.0))
   drop ('008600', '윌비스', 'jump', np.float64(8.74))
   drop ('006490', '프리티', 'jump', np.float64(0.48))
-  drop ('145210', '다이나믹디자인', 'jump', np.float64(9.0))
   drop ('019685', '대교우B', 'jump', np.float64(1.0))
-saved 411583 rows 457 days 909 tickers
-naver index resp {'stockEndType': 'index', 'itemCode': 'KOSPI', 'reutersCode': 'KOSPI', 'symbolCode': 'KOSPI', 'stockName': '코스피', 'itemLogoUrl': 'https://ssl.pstatic.net/imgstock/fn/real/logo/index/IndexKOSPI.svg', 'itemLogoPngUrl': 'https://ssl.pstatic.net/imgstock/fn/real/logo/png/index/IndexKOSPI.png', 'closePrice': '5,239.13', 'compareToPreviousClosePrice': '220.28', 'compareToPreviousPrice': {'code': '2', 't
-index filled from naver 2026-11-10 00:00:00 5239.13
-index rows 457
+  drop ('145210', '다이나믹디자인', 'jump', np.float64(9.0))
+saved 412924 rows 458 days 910 tickers
+index rows 458
 intraday raw rows 2518
-intraday bars 1805 days 5 last ['2026-11-10 15:30', 5239.13]
+intraday bars 1805 days 5 last ['2026-11-11 15:30', 5375.36]
