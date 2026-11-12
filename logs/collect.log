@@ -16,7 +16,7 @@ batch 800 got 880
 batch 880 got 938
 tickers with prices 938 of 938
 share-ratio tickers 115
-naver-filled tickers for 2026-11-12 00:00:00 : 27
+naver-filled tickers for 2026-11-12 00:00:00 : 935
 dropped 28
   drop ('007070', 'GS리테일', 'jump', np.float64(0.34))
   drop ('005180', '빙그레', 'jump', np.float64(0.54))
@@ -47,6 +47,8 @@ dropped 28
   drop ('019685', '대교우B', 'jump', np.float64(1.0))
   drop ('145210', '다이나믹디자인', 'jump', np.float64(9.0))
 saved 413834 rows 459 days 910 tickers
+naver index resp {'stockEndType': 'index', 'itemCode': 'KOSPI', 'reutersCode': 'KOSPI', 'symbolCode': 'KOSPI', 'stockName': '코스피', 'itemLogoUrl': 'https://ssl.pstatic.net/imgstock/fn/real/logo/index/IndexKOSPI.svg', 'itemLogoPngUrl': 'https://ssl.pstatic.net/imgstock/fn/real/logo/png/index/IndexKOSPI.png', 'closePrice': '5,342.73', 'compareToPreviousClosePrice': '-32.63', 'compareToPreviousPrice': {'code': '5', 't
+index filled from naver 2026-11-12 00:00:00 5342.73
 index rows 459
 intraday raw rows 2520
 intraday bars 1805 days 5 last ['2026-11-12 15:30', 5342.73]
