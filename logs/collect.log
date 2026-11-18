@@ -2,24 +2,21 @@ naver stocks 938
 naver marketStatus CLOSE trade date 2026-11-18 00:00:00 use True
 probe 005930 196,400 2026-11-18T20:20:24+09:00 CLOSE {'tradingSessionType': 'AFTER_MARKET', 'overMarketStatus': 'CLOSE', 'overPrice': '196,400', 'localTradedAt': '2026-11-18T20:00:00+09:00'} 1630
 probe 000660 1,164,000 2026-11-18T20:20:24+09:00 CLOSE {'tradingSessionType': 'AFTER_MARKET', 'overMarketStatus': 'CLOSE', 'overPrice': '1,164,000', 'localTradedAt': '2026-11-18T20:00:00+09:00'} 1630
-
-1 Failed download:
-['064350.KS']: OperationalError('database is locked')
-batch 0 got 79
-batch 80 got 159
-batch 160 got 239
-batch 240 got 319
-batch 320 got 399
-batch 400 got 479
-batch 480 got 559
-batch 560 got 639
-batch 640 got 719
-batch 720 got 799
-batch 800 got 879
-batch 880 got 937
-tickers with prices 937 of 938
-share-ratio tickers 114
-naver-filled tickers for 2026-11-18 00:00:00 : 934
+batch 0 got 80
+batch 80 got 160
+batch 160 got 240
+batch 240 got 320
+batch 320 got 400
+batch 400 got 480
+batch 480 got 560
+batch 560 got 640
+batch 640 got 720
+batch 720 got 800
+batch 800 got 880
+batch 880 got 938
+tickers with prices 938 of 938
+share-ratio tickers 115
+naver-filled tickers for 2026-11-18 00:00:00 : 935
 dropped 28
   drop ('007070', 'GS리테일', 'jump', np.float64(0.34))
   drop ('005180', '빙그레', 'jump', np.float64(0.54))
@@ -49,7 +46,7 @@ dropped 28
   drop ('006490', '프리티', 'jump', np.float64(0.48))
   drop ('019685', '대교우B', 'jump', np.float64(1.0))
   drop ('145210', '다이나믹디자인', 'jump', np.float64(9.0))
-saved 417011 rows 463 days 909 tickers
+saved 417474 rows 463 days 910 tickers
 naver index resp {'stockEndType': 'index', 'itemCode': 'KOSPI', 'reutersCode': 'KOSPI', 'symbolCode': 'KOSPI', 'stockName': '코스피', 'itemLogoUrl': 'https://ssl.pstatic.net/imgstock/fn/real/logo/index/IndexKOSPI.svg', 'itemLogoPngUrl': 'https://ssl.pstatic.net/imgstock/fn/real/logo/png/index/IndexKOSPI.png', 'closePrice': '5,067.44', 'compareToPreviousClosePrice': '98.96', 'compareToPreviousPrice': {'code': '2', 'te
 index filled from naver 2026-11-18 00:00:00 5067.44
 index rows 463
