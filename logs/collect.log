@@ -2,24 +2,21 @@ naver stocks 937
 naver marketStatus CLOSE trade date 2026-11-24 00:00:00 use True
 probe 005930 182,900 2026-11-24T20:20:21+09:00 CLOSE {'tradingSessionType': 'AFTER_MARKET', 'overMarketStatus': 'CLOSE', 'overPrice': '182,900', 'localTradedAt': '2026-11-24T20:00:00+09:00'} 1630
 probe 000660 1,113,000 2026-11-24T20:20:23+09:00 CLOSE {'tradingSessionType': 'AFTER_MARKET', 'overMarketStatus': 'CLOSE', 'overPrice': '1,113,000', 'localTradedAt': '2026-11-24T20:00:00+09:00'} 1630
-
-1 Failed download:
-['316140.KS']: OperationalError('database is locked')
-batch 0 got 79
-batch 80 got 159
-batch 160 got 239
-batch 240 got 319
-batch 320 got 399
-batch 400 got 479
-batch 480 got 559
-batch 560 got 639
-batch 640 got 719
-batch 720 got 799
-batch 800 got 879
-batch 880 got 936
-tickers with prices 936 of 937
-share-ratio tickers 114
-naver-filled tickers for 2026-11-24 00:00:00 : 932
+batch 0 got 80
+batch 80 got 160
+batch 160 got 240
+batch 240 got 320
+batch 320 got 400
+batch 400 got 480
+batch 480 got 560
+batch 560 got 640
+batch 640 got 720
+batch 720 got 800
+batch 800 got 880
+batch 880 got 937
+tickers with prices 937 of 937
+share-ratio tickers 115
+naver-filled tickers for 2026-11-24 00:00:00 : 933
 dropped 27
   drop ('007070', 'GS리테일', 'jump', np.float64(0.34))
   drop ('005180', '빙그레', 'jump', np.float64(0.54))
@@ -48,9 +45,9 @@ dropped 27
   drop ('006490', '프리티', 'jump', np.float64(0.48))
   drop ('145210', '다이나믹디자인', 'jump', np.float64(9.0))
   drop ('019685', '대교우B', 'jump', np.float64(1.0))
-saved 420647 rows 467 days 909 tickers
+saved 421114 rows 467 days 910 tickers
 naver index resp {'stockEndType': 'index', 'itemCode': 'KOSPI', 'reutersCode': 'KOSPI', 'symbolCode': 'KOSPI', 'stockName': '코스피', 'itemLogoUrl': 'https://ssl.pstatic.net/imgstock/fn/real/logo/index/IndexKOSPI.svg', 'itemLogoPngUrl': 'https://ssl.pstatic.net/imgstock/fn/real/logo/png/index/IndexKOSPI.png', 'closePrice': '5,006.03', 'compareToPreviousClosePrice': '297.49', 'compareToPreviousPrice': {'code': '2', 't
 index filled from naver 2026-11-24 00:00:00 5006.03
 index rows 467
-intraday raw rows 2440
-intraday bars 1725 days 5 last ['2026-11-24 15:30', 5006.03]
+intraday raw rows 2441
+intraday bars 1726 days 5 last ['2026-11-24 15:30', 5006.03]
