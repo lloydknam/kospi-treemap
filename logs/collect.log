@@ -49,5 +49,5 @@ saved 422024 rows 468 days 910 tickers
 naver index resp {'stockEndType': 'index', 'itemCode': 'KOSPI', 'reutersCode': 'KOSPI', 'symbolCode': 'KOSPI', 'stockName': '코스피', 'itemLogoUrl': 'https://ssl.pstatic.net/imgstock/fn/real/logo/index/IndexKOSPI.svg', 'itemLogoPngUrl': 'https://ssl.pstatic.net/imgstock/fn/real/logo/png/index/IndexKOSPI.png', 'closePrice': '4,697.51', 'compareToPreviousClosePrice': '-308.52', 'compareToPreviousPrice': {'code': '5', '
 index filled from naver 2026-11-25 00:00:00 4697.51
 index rows 468
-intraday raw rows 2441
-intraday bars 1726 days 5 last ['2026-11-25 15:30', 4697.51]
+intraday raw rows 2440
+intraday bars 1725 days 5 last ['2026-11-25 15:30', 4697.51]
